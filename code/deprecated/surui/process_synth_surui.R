@@ -1,0 +1,5 @@
+# This gets synthetic control donor areas for Surui
+
+source("code/functions.R")
+process_synth_data("surui")
+

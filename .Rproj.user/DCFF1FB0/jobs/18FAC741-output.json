@@ -1,0 +1,5 @@
+[1,"Installing 'here' ...\n"]
+[2,"trying URL 'https://cran.rstudio.com/bin/macosx/big-sur-arm64/contrib/4.2/here_1.0.1.tgz'\n"]
+[1,"The downloaded binary packages are in\n"]
+[1,"\t/var/folders/wj/jb77bj_s2cq6q3yjqtnb8wr40000gn/T//Rtmpim8K3i/downloaded_packages\n"]
+[2,"Content type 'application/x-gzip' length 50730 bytes (49 KB)\n==================================================\ndownloaded 49 KB\n\n\n\n✔ Package 'here' successfully installed.\n"]

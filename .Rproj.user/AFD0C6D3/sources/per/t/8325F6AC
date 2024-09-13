@@ -1,0 +1,26 @@
+{
+    "id": "8325F6AC",
+    "path": "G:/.shortcut-targets-by-id/1rdr5l5G0qIwemvG4qzNBH4KvxTHwoEBJ/REDD_specification_curve/code/methods/synthetic_controls/gsynth_logic.R",
+    "project_path": "code/methods/synthetic_controls/gsynth_logic.R",
+    "type": "r_source",
+    "hash": "1420664035",
+    "contents": "",
+    "dirty": false,
+    "created": 1709583215065.0,
+    "source_on_save": false,
+    "relative_order": 9,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "38,6",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1710965295,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1710965295657,
+    "read_only": false,
+    "read_only_alternatives": []
+}

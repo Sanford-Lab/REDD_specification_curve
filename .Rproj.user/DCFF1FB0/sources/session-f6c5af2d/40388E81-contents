@@ -1,0 +1,57 @@
+# Author: Originally by Rachel, then modified by Albert (10/03/2023), and again by Henry (12/31/2023)
+# Date: 12/31/2023 (most recent)
+# Purpose: Runs synthetic controls logic
+
+library(tidyverse)
+library(zoo)
+library(tidyquant)
+library(microsynth)
+
+
+# NOTE: need to add function parameters for all the different things you can tweak for 
+# synthetic controls (i.e. all the different possible combinations of running it)
+apply_microsynth <- function(project_name, start_year, outcome_var = "cum_loss", covariates = NULL) {
+
+  # load the dat_long table
+  load(paste0("data/processed/", project_name, "/dat_synth.Rdata"))
+  
+  start_year = as.numeric(start_year)
+  
+  synth_dat <- as.data.frame(dat_long) %>% 
+    mutate(year = as.numeric(year),
+           D = ifelse(treated ==1 & year >= start_year, 1, 0))%>%
+    rename(Y = outcome_var)%>%
+    select(ID, Y, D, year, covariates)
+  
+  results_microsynth <- data.frame()
+  for(covariate in covariates){
+    my_predictors <- covariates[covariates != covariate]
+    
+    out_microsynth <- microsynth(as.data.frame(synth_dat), 
+                                 idvar="ID", timevar="year", intvar="D", 
+                                 start.pre=1, 
+                                 end.pre=(start_year - 1), 
+                                 end.post=22, 
+                                 match.out="Y", match.covar=my_predictors, 
+                                 result.var="Y", 
+                                 test="two-sided",
+                                 perm=250, jack=FALSE
+                                 , check.feas=TRUE, use.backup=TRUE
+    )
+    
+    results_microsynth <- out_microsynth$Results$`22` %>%
+      as.data.frame()%>%
+      mutate(project = project_name,
+             ATT = Trt - Con,
+             se = abs(ATT/qnorm(Perm.pVal)),
+             excluded_cov = covariate,
+             synth_method = "traditional SC")%>%
+      select(project, ATT, se, excluded_cov, synth_method)%>%
+      rbind(results_microsynth)
+    
+  }
+  
+  return(results_microsynth)
+}
+
+

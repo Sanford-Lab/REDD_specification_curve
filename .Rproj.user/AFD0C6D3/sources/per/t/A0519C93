@@ -1,0 +1,28 @@
+{
+    "id": "A0519C93",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1713818354564.0,
+    "source_on_save": false,
+    "relative_order": 17,
+    "properties": {
+        "id": "a85d1b2516254997ae57f7af3e52fe0f",
+        "name": "projects",
+        "title": "projects",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 3271410164274377058,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1713818354564,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,43 @@
+# Author: Albert (3/4/2024)
+# Date: 3/4/2024 (most recent)
+# Purpose: Runs synthetic controls logic
+
+library(tidyverse)
+library(zoo)
+library(tidyquant)
+library(gsynth)
+
+
+# NOTE: need to add function parameters for all the different things you can tweak for 
+# synthetic controls (i.e. all the different possible combinations of running it)
+apply_augsynth <- function(project_name, start_year, outcome_var = "cum_loss", covariates = NULL) {
+  
+  # load the dat_long table
+  load(paste0("data/processed/", project_name, "/dat_synth.Rdata"))
+  
+  my_predictors <- covariates
+  
+  start_year = as.numeric(start_year)
+  
+  synth_dat <- as.data.frame(dat_long) %>% 
+    mutate(year = as.numeric(year),
+           D = ifelse(treated ==1 & year >= start_year, 1, 0))%>%
+    rename(Y = outcome_var)%>%
+    select(ID, Y, D, year, my_predictors)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  out <- list(results_gsynth)
+  return(out)
+  
+  
+  
+}
+
+

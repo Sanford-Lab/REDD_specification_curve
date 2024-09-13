@@ -1,0 +1,26 @@
+{
+    "id": "6D446841",
+    "path": "G:/.shortcut-targets-by-id/1rdr5l5G0qIwemvG4qzNBH4KvxTHwoEBJ/REDD_specification_curve/code/methods/causal_forests/forest_logic.R",
+    "project_path": "code/methods/causal_forests/forest_logic.R",
+    "type": "r_source",
+    "hash": "2306967947",
+    "contents": "",
+    "dirty": false,
+    "created": 1713212142337.0,
+    "source_on_save": false,
+    "relative_order": 13,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "26,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1713813925,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1713813925,
+    "read_only": false,
+    "read_only_alternatives": []
+}

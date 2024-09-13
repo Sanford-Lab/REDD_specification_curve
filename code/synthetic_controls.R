@@ -1,0 +1,114 @@
+library(here)
+library(dplyr)
+
+# Get list of all (project name, start year)
+source(here('code', 'Projects', 'universal_list_of_projects.R'))
+projects <- get_projects()
+
+
+# Processing all the datasets:
+source(here("code", "methods", "synthetic_controls", "synthetic_controls_processing.R"))
+
+
+#projects = projects[1:2]
+
+# Processing all the datasets:
+# for (project in projects) {
+#   print(project[1])
+#   process_synth_data(project[1])
+# }
+
+
+source(here("code", "methods", "synthetic_controls", "microsynth_logic.R"))
+source(here("code", "methods", "synthetic_controls", "gsynth_logic.R"))
+
+covariates = c("treecover_2000",
+               "hillshade",
+               "aspect", 
+               "elevation",
+               "slope"
+              # "accessibility 
+              # "accessibility_walking_only"
+              )
+
+synth_results <- data.frame()
+gsynth_results <- data.frame()
+for (project in projects) {
+  synth_results <- apply_microsynth(project[1], project[2], outcome_var = "cum_loss", covariates = covariates) %>%
+    rbind(synth_results)
+
+  gsynth_results <- apply_gsynth(project[1], project[2], outcome_var = "cum_loss", covariates = NULL, estimators = "ife")%>%
+    rbind(gsynth_results)
+  
+ # augsynth_results <- apply_augsynth(project[1], project[2], outcome_var = "cum_loss", covariates = covariates)
+  
+}
+
+save(synth_results, gsynth_results, file = paste0(here("data", "results"), "sc_results.Rdata"))
+
+load(here("data", "results", "sc_results.Rdata"))
+
+source(here("code", "spec_curve", "schart_ortiz.R"))
+color = "black"
+
+for (project in projects) {
+  project_synth_results <- synth_results %>%
+    filter(project == project[1]) %>%
+    mutate("cov_included" = FALSE)%>%
+    pivot_wider(names_from = "excluded_cov", values_from = "cov_included", values_fill = TRUE )
+    
+    
+    project_gsynth_results <- gsynth_results %>%
+      filter(project == project[1]) %>%
+      mutate(# "estimator_true" = TRUE,
+             "fe_true" = TRUE)%>%
+      #pivot_wider(names_from = "estimator", values_from = "estimator_true", values_fill = FALSE )%>%
+      pivot_wider(names_from = "fixed effects", values_from = "fe_true", values_fill = FALSE )%>%
+      select(-none
+             , - estimator
+             )
+      
+    
+    spec_chart_results <- project_synth_results %>%
+      bind_rows(project_gsynth_results) %>%
+      mutate("method_true" = TRUE)%>%
+      mutate_all(replace_na, replace = FALSE)%>%
+      pivot_wider(names_from = "synth_method", values_from = "method_true", values_fill = FALSE )%>%
+      select(-project) %>% as.data.frame()
+  
+  labels = list(
+    "Covariates" = c("Tree cover (2000)", 
+                     "Hillshade", 
+                     "Aspect", 
+                     "Elevation",
+                     "Slope"
+                     ),
+    "Fixed effects" = c("unit", "time", "two-way"),
+    "Method" = c("Traditional SC", "Generalized SC")
+  )
+  
+  png(paste0("figs", "/sc/sc_",project[1]), width = 7, height = 5, units = "in", res = 300)
+  
+  par(oma=c(1,0,1,1))
+  
+  schart(spec_chart_results, 
+         labels = labels, 
+         # highlight = 2,
+         #ylim = ylim, 
+         axes = FALSE, 
+        # index.ci=index.ci,
+         ylab="ATT\n(cumulative deforestation)",
+        # leftmargin = 5,
+        # order=spec_order,
+         col.est=c(color,"royalblue"), 
+         col.dot=c(color,"grey95","grey95","royalblue"),
+         bg.dot=c(color,"grey95","grey95","white")
+  )
+  print(project) # in format of (project_name, start_year)
+  text(x=mean(1:nrow(spec_chart_results)), y=max(spec_chart_results$ATT + 2*spec_chart_results$se), project[1], col="black", font=2)
+  
+  dev.off()
+  
+  
+}
+

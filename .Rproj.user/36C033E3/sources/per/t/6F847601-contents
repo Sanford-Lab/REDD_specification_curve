@@ -1,0 +1,153 @@
+
+
+library(shiny)
+library(leaflet)
+library(tidyverse)
+library(DT)
+
+
+outputDir <- "submissions"
+if (!dir.exists(outputDir)) {
+  dir.create(outputDir, recursive = FALSE)
+}
+
+globalRdsPath <- file.path(outputDir, "globalData.rds") 
+
+
+saveSessionData <- function(saveData) {
+  if (nrow(saveData) > 0) {
+    # Save session data as RDS
+    sessionFileName <- paste0("sessionData_", Sys.Date(), "_", format(Sys.time(), "%H-%M-%S"), ".rds")
+    saveRDS(saveData, file.path(outputDir, sessionFileName))
+    
+    # Read and update global data
+    if (file.exists(globalRdsPath)) {
+      globalData <- readRDS(globalRdsPath)
+      updatedGlobalData <- rbind(globalData, saveData)
+    } else {
+      updatedGlobalData <- saveData }
+    saveRDS(updatedGlobalData, globalRdsPath)
+  }
+}
+
+# Define UI. 
+UI <- fluidPage(
+  titlePanel("Choose a Location"),
+  mainPanel(leafletOutput("map")),
+  radioButtons("radio", label = h3("Radio buttons"),
+               choices = list("Forest" = 1, "Not Forest" = 2), 
+               selected = 1),
+  numericInput("ForestPercentage", "Enter Forest Percentage", min = 0, max = 100, value = 0),
+  fileInput("File", "Upload a CSV or RDS file of location data", accept = c(".csv", ".rds")),
+  actionButton("saveButton", "Save Session"),
+  actionButton("submitClick", "Submit Click"),
+  hr(),
+  tableOutput("clickedPointsTable")
+)
+
+
+# Define server logic, telling app how to save and display info.
+SERVER <- function(input, output, session) {
+  sessionData <- reactiveVal(data.frame(Longitude = numeric(0), Latitude = numeric(0), Forest = numeric(0), ForestPercentage = numeric(0)))
+  lastClick <- reactiveVal(NULL)
+  loadedData <- reactiveVal(data.frame())
+  output$map <- renderLeaflet({ 
+    map <- leaflet() %>%
+      addTiles() %>%
+      setView(lng = -73.95, lat = 40.73, zoom = 12) %>%
+      addProviderTiles('Esri.WorldImagery')
+    map
+  })
+
+  observeEvent(input$map_click, {
+    click <- input$map_click
+    lastClick(list(Longitude = input$map_click$lng, Latitude = input$map_click$lat))
+    proxy <- leafletProxy("map")
+    proxy %>% 
+      clearGroup("new_point") %>% 
+      addCircles(click$lng, 
+                 click$lat, 
+                 radius = 100, 
+                 color = 'red',
+                 group = "new_point")
+    })
+
+  observeEvent(input$submitClick, {
+    if (!is.null(lastClick())) {
+      newClick <- data.frame(Longitude = lastClick()$Longitude, 
+                             Latitude = lastClick()$Latitude, 
+                             Forest = as.numeric(input$radio), 
+                             ForestPercentage = input$ForestPercentage)
+      sessionData(rbind(sessionData(), newClick))
+      lastClick(NULL)  # Reset lastClick after appending bc we only want most recent one to be added
+    }
+  })
+
+  observeEvent(input$saveButton, { 
+    saveData <- sessionData()
+    saveSessionData(saveData)
+    sessionData(data.frame(Longitude = numeric(0), Latitude = numeric(0), Forest = numeric(0), ForestPercentage = numeric(0)))  # Reset sessionData
+  })
+
+  #READING CSV's (its only looking for coordinates rn)
+  observeEvent(input$File, {
+    inFile <- input$File
+    if (!is.null(inFile)) {
+      ext <- tools::file_ext(inFile$name)
+      if (ext == "csv") {
+        data <- read.csv(inFile$datapath, stringsAsFactors = FALSE)
+      } else if (ext == "rds") {
+        data <- readRDS(inFile$datapath)
+      } 
+      if ("Longitude" %in% names(data)) {
+        data <- data %>% rename(lng = Longitude)
+      }
+      if ("Latitude" %in% names(data)) {
+        data <- data %>% rename(lat = Latitude)
+      }
+      loadedData(data)
+      data$lat <- as.numeric(data$lat)
+      data$lng <- as.numeric(data$lng)
+      min_lat <- min(data$lat)
+      max_lat <- max(data$lat)
+      min_lng <- min(data$lng)
+      max_lng <- max(data$lng)
+      bounds <- list(
+        south = min_lat,
+        north = max_lat,
+        west = min_lng,
+        east = max_lng)
+      
+      observe({
+        leafletProxy("map", session) %>% clearMarkers()
+        for (i in 1:nrow(data)) {
+          popupContent <- paste(names(data), ": ", data[i, ], collapse = "<br>")
+          leafletProxy("map", session) %>%
+            addMarkers(lng = data$lng[i], lat = data$lat[i], popup = popupContent)
+        }
+      })
+      
+    }
+  })
+  #this displays coordinates in a table on the app so you can see what you've entered
+  output$clickedPointsTable <- renderTable({
+    sessionData() })
+}
+
+
+shinyApp(ui = UI, server = SERVER)
+
+#TO DO: 
+#-fix the global CSV so that it properly appends across all sessions
+#-change the view (in input$csvfile function) so it zooms in when you click a marker
+#-!!!load GEE data (read up on the data included in it and what to use) into this app using the rgee package.
+#-!!! make a button or kind of toggle function that allows you to view GEE imagery
+#in the map display over time
+
+
+
+
+
+
+
+

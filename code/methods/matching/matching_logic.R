@@ -1,0 +1,94 @@
+# Author: Henry Chen
+# Date: 7/25/2023
+# Function: Function to apply matching. parameters include start year of project and project name
+
+library(MatchIt)
+library(estimatr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+match_data <- function(project_name, start_year, method = "nearest", covariates = c("treecover_past", "accessibility", "accessibility_walking_only", "aspect", "elevation", "slope"), distance = "logit", ratio = 5) {
+  
+  # load the dat_long table
+  load(paste0("data/processed/", project_name, "/dat_matching.Rdata"))
+  
+  # add a new column for treecover in the year right before start date to the dat_long table
+  dat_long <- dat_long %>% 
+    filter(year == start_year - 1) %>% 
+    select(ID, treecover_remaining) %>%
+    rename(treecover_past = treecover_remaining) %>% 
+    right_join(dat_long)
+  
+  # filter dat_long so that you only get match data for the year right before
+  # (these properties should be static)
+  dat_long_past <- dat_long %>% filter(year == start_year - 1)
+  
+  # match it!
+  # m_out <- matchit(treated ~ treecover_past + accessibility + accessibility_walking_only
+  #                  + aspect + elevation + slope, data = dat_long_past, method = method, 
+  #                  distance = distance, ratio = ratio) # utilize method, distance, and ratio parameters
+  
+
+  m_out <- matchit(formula = as.formula(paste("treated ~", paste(covariates, collapse = " + "))), data = dat_long_past, method = method, 
+                   distance = distance, ratio = ratio) # utilize method, distance, and ratio parameters
+
+  m_data <- match.data(m_out)
+  
+  # determine the ATE, regressing either the tree_cover or loss on whether treated or not
+  ate <- lm_robust(treecover_remaining ~ treated, data = m_data, weights = m_data$weights)
+  
+  # filter m_data so its just ID and weights (two new columns)
+  m_data <- m_data %>% select(ID, weights)
+  
+  # add these two new columns to dat_long and drop any null entries.
+  # now dat_long only has points that were actually matched.
+  # from this point on, only use dat_long as it includes everything you need (including weights)
+  dat_long <- dat_long %>%
+    left_join(m_data) %>% drop_na(weights)
+  
+  
+  # now do this for all the years from project start year to 2022 by creating a dataframe to store
+  # ate value and respective confidence interval bounds.
+  ates_by_year <- setNames(data.frame(matrix(ncol = 4, nrow = 0)), 
+                           c("year", "coef", "lower", "upper"))
+  
+  # have years starting from three years before start date to see pre-treatment trend
+  years <- list((start_year - 3) : 22) 
+  
+  # loop through all 22 years and run the regression filtering for that specific year only
+  for (i in years[[1]]) {
+    
+    # get dat_long but only for the current year
+    dat_i <- dat_long %>% filter(year == i)
+    
+    # calculate the ATE for the specified year
+    ate_i <- lm_robust(treecover_remaining ~ treated, data = dat_i, weights = dat_i$weights)
+    
+    # get the coefficient and CI for the treated variable in the regression
+    coef <- coef(ate_i)[2]
+    upper <- coef(summary(ate_i))[2, 6]
+    lower <- coef(summary(ate_i))[2, 5]
+    
+    # save the coef to the ates_by_year df
+    add <- data.frame(i, coef, lower, upper) %>% setNames(c("year", "coef", "lower", "upper"))
+    ates_by_year <- bind_rows(ates_by_year, add)
+  }
+  
+  # plot the graph
+  ggplot(ates_by_year, aes(x = year, y = coef)) +
+    geom_point() +
+    geom_line() +
+    # add vertical line to indicate start year of project
+    geom_vline(aes(xintercept = start_year), color = "red", linetype = "dashed", size = 0.7) +
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "forestgreen") +
+    labs(x = "Years since 2000", y = "ATE (treecover remaining)",
+         title = paste0("ATEs by Year for ", project_name, " project")) +
+    theme_bw()
+  
+  
+  # FUTURE WORK: return a dataframe each time you run matching and then construct
+  # the spec curve from that ? 
+  return(ates_by_year)
+}
+

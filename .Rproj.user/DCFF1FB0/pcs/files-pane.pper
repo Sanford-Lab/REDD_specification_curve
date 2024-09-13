@@ -1,0 +1,21 @@
+{
+    "sortOrder": [
+        {
+            "columnIndex": 3,
+            "ascending": false
+        },
+        {
+            "columnIndex": 2,
+            "ascending": true
+        },
+        {
+            "columnIndex": 4,
+            "ascending": false
+        },
+        {
+            "columnIndex": 1,
+            "ascending": true
+        }
+    ],
+    "path": "~/Library/CloudStorage/GoogleDrive-henry.chen@yale.edu/.shortcut-targets-by-id/1rdr5l5G0qIwemvG4qzNBH4KvxTHwoEBJ/REDD_specification_curve/code/methods/synthetic_controls"
+}

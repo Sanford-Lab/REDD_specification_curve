@@ -1,0 +1,77 @@
+# Author: Originally by Rachel, then modified by Albert (10/03/2023), and again by Henry (12/31/2023)
+# Date: 12/31/2023 (most recent)
+# Purpose: Runs synthetic controls logic
+
+library(tidyverse)
+library(zoo)
+library(tidyquant)
+library(tidysynth)
+library(microsynth)
+
+
+# NOTE: need to add function parameters for all the different things you can tweak for 
+# synthetic controls (i.e. all the different possible combinations of running it)
+apply_synth <- function(project_name, start_year, outcome_var = "loss") {
+
+  # load the dat_long table
+  load(paste0("data/processed/", project_name, "/dat_synth.Rdata"))
+  
+  my_predictors <- c("treecover_2000", 
+                     "elevation", 
+                     "slope")
+  
+  start_year = as.numeric(start_year)
+  
+  synth_dat <- as.data.frame(dat_long) %>% 
+    mutate(year = as.numeric(year),
+           D = ifelse(treated ==1 & year >= start_year, 1, 0))%>%
+    rename(Y = outcome_var)%>%
+    select(ID, Y, D, year, my_predictors)
+  
+  out_microsynth <- microsynth(as.data.frame(synth_dat), 
+                    idvar="ID", timevar="year", intvar="D", 
+                    start.pre=1, 
+                    end.pre=(start_year - 1), 
+                    end.post=22, 
+                    match.out="Y", match.covar=my_predictors, 
+                    result.var="Y", 
+                    test="two-sided",
+                    perm=250, jack=FALSE
+                    , check.feas=TRUE, use.backup=TRUE
+  )
+  
+  plot <- plot_microsynth(out_microsynth)
+  
+  results_microsynth <- out_microsynth$Results$`22` %>%
+    as.data.frame()%>%
+  select(Trt, Con, Pct.Chng , Perm.pVal)
+  
+  
+  
+  out_gsynth <- gsynth(Y ~ D
+                , data = synth_dat, 
+                index = c("ID","year"), 
+                force = "two-way", 
+                CV = TRUE, r = c(0, 5), se = TRUE, 
+                inference = "parametric", nboots = 1000, 
+                parallel = FALSE)
+  
+  plot(out_gsynth)
+  
+  if (outcome_var == "loss"){
+    results_gsynth = out_gsynth$est.avg
+  } else{
+    results_gsynth = out_gsynth$est.att %>%
+      as.data.frame()%>%
+      rownames_to_column(var = "year")%>%
+      filter(year == max(as.numeric(year)))
+  }
+  
+  out <- list(results_gsynth, results_microsynth)
+  return(out)
+  
+  
+    
+}
+
+

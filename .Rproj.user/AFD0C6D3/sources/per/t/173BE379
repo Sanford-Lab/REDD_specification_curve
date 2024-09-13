@@ -1,0 +1,26 @@
+{
+    "id": "173BE379",
+    "path": "G:/.shortcut-targets-by-id/1rdr5l5G0qIwemvG4qzNBH4KvxTHwoEBJ/REDD_specification_curve/code/spec_curve/create_spec_chart_function.R",
+    "project_path": "code/spec_curve/create_spec_chart_function.R",
+    "type": "r_source",
+    "hash": "609151964",
+    "contents": "",
+    "dirty": false,
+    "created": 1710963610100.0,
+    "source_on_save": false,
+    "relative_order": 11,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "53,2",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1704957882,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1704957882,
+    "read_only": false,
+    "read_only_alternatives": []
+}
