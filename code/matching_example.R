@@ -89,9 +89,9 @@ source(here("code", "spec_curve", "create_spec_chart_function.R"))
 
 # return matching specification curve but looped.
 for (i in 1:length(projects)) {
-  creates_spec_chart(project_name = projects[[i]], 
-                      plotting_results[[i]], 
-                      spec_order = "increasing", 
-                      color = "royalblue")
+  create_spec_chart(project_name = projects[[i]], 
+                    plotting_results[[i]], 
+                    spec_order = "increasing", 
+                    color = "royalblue")
 }
 
