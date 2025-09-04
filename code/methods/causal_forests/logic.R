@@ -19,7 +19,7 @@ source(here('code', 'Projects', 'universal_list_of_projects.R'))
 projects <- get_projects()
 
 # process the datasets from all projects:
-source(here("code", "methods", "causal_forests", "forest_processing.R"))
+source(here("code", "methods", "causal_forests", "processing.R"))
 for (project in projects) {process_forest_data(project[1])}
 
 #-------------------------------------------------------------------------------
@@ -126,10 +126,8 @@ for (i in 1:length(projects)) {
   create_spec_chart(project_name = projects[[i]], 
                      plotting_results[[i]], 
                      spec_order = "increasing", 
-                     color = "darkorange")
+                     color = "darkorange", 
+                     leftmargin = 30)
 }
 
 
-  
-  
-  

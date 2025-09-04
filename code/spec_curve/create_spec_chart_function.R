@@ -8,7 +8,8 @@ library(here)
 # load base schart function
 source(here::here("code", "Spec_Curve", "schart_ortiz.R"))
 
-create_spec_chart <- function(project_name, results, spec_order = "asis", color = "black") {
+create_spec_chart <- function(project_name, results, spec_order = "asis",
+                              color = "black", leftmargin = 7) {
   
   results <- results[, names(results) != "project_name"]
   label_colnames <- colnames(results %>% select(-c(ATT, lower, upper)))
@@ -44,7 +45,7 @@ create_spec_chart <- function(project_name, results, spec_order = "asis", color 
          axes = FALSE, 
          index.ci=index.ci,
          ylab="ATE",
-         leftmargin = 7,
+         leftmargin = leftmargin,
          order=spec_order,
          col.est=c(color,"royalblue"), 
          col.dot=c(color,"grey95","grey95","royalblue"),

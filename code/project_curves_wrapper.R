@@ -27,9 +27,9 @@ make_sc_curves <- function(projects, ate_method, p_list) {
   
   # Iterate through all possible permutations for each project.
   for (project in projects) {
-    curr_proj_results <- data.frame(project_name = character(), year = numeric(),
-                                    ATT = numeric(), lower = numeric(),
-                                    upper = numeric())
+    curr_proj_results <- data.frame(project_name = character(),
+                                    year = numeric(), ATT = numeric(),
+                                    lower = numeric(), upper = numeric())
     for (i in 1:nrow(p_grid)) {
       params <- p_grid[i, ]
       

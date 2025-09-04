@@ -1,7 +1,7 @@
 # Author: Previously unknown, Megan Ayers as of 2025
 # Date: 12/23/2023
-# Function: Cleans CSVs to create dataframe that is conducive of running the matching
-# procedure on. saves this data frame as a .Rdata file.
+# Function: Cleans CSVs to create dataframe that is conducive for running
+# matching. Saves this data frame as a .Rdata file.
 library(tidyverse)
 library(zoo)
 library(tidyquant)
