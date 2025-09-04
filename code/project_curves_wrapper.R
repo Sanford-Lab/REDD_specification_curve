@@ -12,6 +12,9 @@ source(here("code", "spec_curve", "create_spec_chart_function.R"))
 make_sc_curves <- function(projects, ate_method, p_list) {
   
   # Load processing and logic functions for the given method.
+  # NOTE: This means `ate_method` must match the name of the method directory,
+  # and each directory must have files with these specific names, containing
+  # functions named exactly `process()` and `execute_method()`.
   source(here("code", "methods", ate_method, "processing.R"))
   source(here("code", "methods", ate_method, "logic.R"))
   
@@ -22,6 +25,7 @@ make_sc_curves <- function(projects, ate_method, p_list) {
   }
   
   # Create grid of parameter permutations.
+  # TODO: Make this robust to parameters that are vector-valued (ex. covariates)
   p_grid <- expand.grid(p_list, stringsAsFactors = FALSE)
   
   
@@ -41,6 +45,8 @@ make_sc_curves <- function(projects, ate_method, p_list) {
                                      params = params)
       
       # Retrieve the ATT, lower and upper CI bounds for the year 2022.
+      # NOTE: May want to make year an input variable, or a project-specific
+      # feature saved in the `projects` list with name and start year.
       result_2022 <- ates_by_year %>% filter(year == 22)
       curr_proj_results <- rbind(curr_proj_results, data.frame(
         project_name = project[1],
