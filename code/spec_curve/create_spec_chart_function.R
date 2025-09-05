@@ -8,8 +8,10 @@ library(here)
 # load base schart function
 source(here::here("code", "Spec_Curve", "schart_ortiz.R"))
 
-create_spec_chart <- function(project_name, results, spec_order = "asis", color = "black") {
+create_spec_chart <- function(project_name, results, spec_order = "asis",
+                              color = "black", leftmargin = 7) {
   
+  results <- results[, names(results) != "project_name"]
   label_colnames <- colnames(results %>% select(-c(ATT, lower, upper)))
   
   these_results <- results %>% distinct %>%
@@ -29,7 +31,7 @@ create_spec_chart <- function(project_name, results, spec_order = "asis", color 
     
   }
   
-  schart_results <- these_results %>% as.data.frame()%>%
+  schart_results <- these_results %>% as.data.frame() %>%
     select(ATT, everything(), -ID)
   
   index.ci <- match(c("upper","lower"), names(schart_results))
@@ -43,13 +45,13 @@ create_spec_chart <- function(project_name, results, spec_order = "asis", color 
          axes = FALSE, 
          index.ci=index.ci,
          ylab="ATE",
-         leftmargin = 5,
+         leftmargin = leftmargin,
          order=spec_order,
          col.est=c(color,"royalblue"), 
          col.dot=c(color,"grey95","grey95","royalblue"),
          bg.dot=c(color,"grey95","grey95","white")
   )
-  print(project_name) # in format of (project_name, start_year)
+  # print(project_name) # in format of (project_name, start_year)
   text(x=mean(1:nrow(schart_results)), y=max(schart_results$upper), project_name[1], col="black", font=2)
   
 }
