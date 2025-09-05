@@ -35,10 +35,8 @@ execute_method <- function(project_name, start_year, params) {
   
   
   # Perform matching according to params.
-  form <- as.formula(paste("treated ~",
-                           paste(c("treecover_past", "accessibility",
-                                   "accessibility_walking_only", "aspect",
-                                   "elevation", "slope"), collapse = " + ")))
+  form <- as.formula(paste("treated ~", paste(params$covariates[[1]],
+                                              collapse = " + ")))
   m_out <- matchit(formula = form, data = dat_long_past, method = params$method, 
                    distance = params$distance, ratio = params$ratio)
   m_data <- match.data(m_out)

@@ -4,7 +4,6 @@
 #           Performs all permutations to generate per-project specification
 #           curves for the method, and saves the associated data frames.
 
-library(here)
 library(dplyr)
 source(here("code", "spec_curve", "create_spec_chart_function.R"))
 
@@ -66,8 +65,9 @@ make_sc_curves <- function(projects, ate_method, p_list) {
     # Plot and save specification curve.
     png(paste0("figs/sc/", ate_method, "/", project[1], ".png"),
         width = 800, height = 800)
-    create_spec_chart(project_name = project[1], curr_proj_results, 
-                      spec_order = "increasing", color = "royalblue")
+    create_spec_chart(project_name = project[1], results = curr_proj_results, 
+                      spec_order = "increasing", color = "royalblue",
+                      leftmargin = 5)
     dev.off()
     
   }

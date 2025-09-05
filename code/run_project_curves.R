@@ -12,6 +12,10 @@ projects <- get_projects()
 ate_method <- "matching"
 p_list <- list(method = c("nearest", "cem"),
                distance = c("logit", "mahalanobis", "euclidean"),
-               ratio = c(1, 3, 5))
+               ratio = c(1, 3, 5),
+               covariates = list(c("treecover_past", "accessibility",
+                                   "accessibility_walking_only", "aspect",
+                                   "elevation", "slope"),
+                                 c("treecover_past", "accessibility")))
 
 make_sc_curves(projects, ate_method, p_list)

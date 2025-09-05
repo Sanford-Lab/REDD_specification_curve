@@ -3,6 +3,7 @@
 # Purpose: 
 
 library(here)
+library(stringr)
 
 
 # load base schart function
@@ -20,6 +21,18 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   labels <- c()
   for(col in label_colnames){
     labelname <- col
+    
+    # Handle vector-valued parameters
+    if (class(results[, col]) == "list") {
+      results[, col] <- sapply(1:nrow(results), function(i) {
+        paste(results[i, col][[1]], collapse = ", ")})
+      # These might be too long to display comfortably - if so just call them
+      # set 1, set 2, ..., set n. 
+      if (any(str_count(unique(results[, col]), ".") > 20)) {
+        results[, col] <- paste("Set", as.numeric(factor(results[, col])))
+      }
+    }
+    
     labels <- c(labels,
                 unique(results[col])
     )

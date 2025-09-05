@@ -183,7 +183,7 @@ schart <- function(data, labels=NA, highlight=NA, n=1, index.est=1, index.se=2, 
     }
     # Does not accomodate subscripts
     if (horizontal) {
-      text(-rev(offset)[1], yloc , labels=unlist(labels), adj=rev(adj)[1], font=fonts[2], cex=cex[2])
+      text(-rev(offset)[1], yloc , labels=str_wrap(unlist(labels), 30), adj=rev(adj)[1], font=fonts[2], cex=cex[2])
     } else {
       text(yloc,-rev(offset)[1], labels=unlist(labels), adj=rev(adj)[1], font=fonts[2], cex=cex[2], srt=90)
     }
