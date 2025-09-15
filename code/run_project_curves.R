@@ -8,14 +8,24 @@ library(here)
 source(here("code", "project_curves_wrapper.R"))
 source(here('code', 'Projects', 'universal_list_of_projects.R'))
 
-projects <- get_projects()
-ate_method <- "matching"
-p_list <- list(method = c("nearest", "cem"),
-               distance = c("logit", "mahalanobis", "euclidean"),
-               ratio = c(1, 3, 5),
-               covariates = list(c("treecover_past", "accessibility",
-                                   "accessibility_walking_only", "aspect",
-                                   "elevation", "slope"),
-                                 c("treecover_past", "accessibility")))
+projects <- get_projects()[1:2]
+
+### Uncomment / adjust p_list to run for MATCHING.
+# ate_method <- "matching"
+# p_list <- list(method = c("nearest", "cem"),
+#                distance = c("logit", "mahalanobis", "euclidean"),
+#                ratio = c(1, 3, 5),
+#                covariates = list(c("treecover_past", "accessibility",
+#                                    "accessibility_walking_only", "aspect",
+#                                    "elevation", "slope"),
+#                                  c("treecover_past", "accessibility")))
+
+
+### Uncomment / adjust p_list to run for SYNTHETIC CONTROLS.
+ate_method <- "synthetic_controls"
+p_list <- list(sc_method = c("gsynth"),
+               force = c("none", "unit", "time", "two-way"),
+               estimator = c("ife"),
+               r = c(1, 2, 3, 4, 5, "cv"))
 
 make_sc_curves(projects, ate_method, p_list)

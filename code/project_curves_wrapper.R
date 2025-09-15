@@ -20,7 +20,8 @@ make_sc_curves <- function(projects, ate_method, p_list) {
   # Process all project data sets.
   for (project in projects) {
     process(project[1])
-    print(paste0("Finished processing ", project[1], " data for matching."))
+    print(paste0("Finished processing ", project[1], " data for ", ate_method,
+                 "."))
   }
   
   # Create grid of parameter permutations.
