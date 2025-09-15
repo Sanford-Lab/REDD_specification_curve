@@ -25,7 +25,6 @@ make_sc_curves <- function(projects, ate_method, p_list) {
   }
   
   # Create grid of parameter permutations.
-  # TODO: Make this robust to parameters that are vector-valued (ex. covariates)
   p_grid <- expand.grid(p_list, stringsAsFactors = FALSE)
   
   

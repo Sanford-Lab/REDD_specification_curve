@@ -23,9 +23,13 @@ projects <- get_projects()[1:2]
 
 ### Uncomment / adjust p_list to run for SYNTHETIC CONTROLS.
 ate_method <- "synthetic_controls"
-p_list <- list(sc_method = c("gsynth"),
-               force = c("none", "unit", "time", "two-way"),
-               estimator = c("ife"),
-               r = c(1, 2, 3, 4, 5, "cv"))
+# p_list <- list(sc_method = c("gsynth"),
+#                force = c("none", "unit", "time", "two-way"),
+#                estimator = c("ife"),
+#                r = c(1, 2, 3, 4, 5, "cv"))
+p_list <- list(sc_method = c("microsynth"),
+               covariates = list(c("treecover_2000", "hillshade", "aspect", 
+                                   "elevation", "slope"),
+                                 c("elevation", "slope")))
 
 make_sc_curves(projects, ate_method, p_list)
