@@ -23,7 +23,7 @@ execute_method <- function(project_name, start_year, params,
     rename(Y = outcome_var) %>%
     select(all_of(c("ID", "Y", "D", "year", params$covariates[[1]])))
   
-  if (!is.null(params$covariates)) {
+  if (!is.null(params$covariates[[1]])) {
     form <- as.formula(paste("Y ~ D +", paste(params$covariates[[1]],
                                               collapse = " + ")))
   } else {

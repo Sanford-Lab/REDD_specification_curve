@@ -15,23 +15,41 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   results <- results[, names(results) != "project_name"]
   label_colnames <- colnames(results %>% select(-c(ATT, lower, upper)))
   
+  
+  for (col in label_colnames) {
+    
+    # Handle NAs.
+    if (anyNA(results[, col])) {
+      results[, col] <- as.character(results[, col])
+      results[, col] <- ifelse(is.na(results[, col]), "NA",
+                               results[, col])
+    }
+    
+    # Handle vector-valued parameters
+    if (class(results[, col]) == "list") {
+      results[, col] <- sapply(1:nrow(results), function(i) {
+        if (is.null(results[i, col][[1]])) {
+          "none"
+        } else {
+          paste(results[i, col][[1]], collapse = ", ")
+        }})
+      # These might be too long to display comfortably - if so just call them
+      # set 1, set 2, ..., set n. 
+      if (any(str_count(unique(results[, col]), ".") > 20)) {
+        these <- results[, col] != "none"
+        results[these, col] <- paste("set",
+                                     as.numeric(factor(results[these, col])))
+      }
+    }
+  }
+  
+  
   these_results <- results %>% distinct %>%
     rowid_to_column("ID")
   
   labels <- c()
   for(col in label_colnames){
     labelname <- col
-    
-    # Handle vector-valued parameters
-    if (class(results[, col]) == "list") {
-      results[, col] <- sapply(1:nrow(results), function(i) {
-        paste(results[i, col][[1]], collapse = ", ")})
-      # These might be too long to display comfortably - if so just call them
-      # set 1, set 2, ..., set n. 
-      if (any(str_count(unique(results[, col]), ".") > 20)) {
-        results[, col] <- paste("Set", as.numeric(factor(results[, col])))
-      }
-    }
     
     labels <- c(labels,
                 unique(results[col])
@@ -40,7 +58,7 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
     these_results <- these_results %>%
       mutate("TRUE" = TRUE) %>% 
       pivot_wider(names_from = col, values_from = "TRUE", values_fill = FALSE,
-      )
+                  names_repair = "unique")
     
   }
   
