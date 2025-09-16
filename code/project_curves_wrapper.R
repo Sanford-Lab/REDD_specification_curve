@@ -33,7 +33,9 @@ make_sc_curves <- function(projects, ate_method, p_list, plot_only = FALSE,
       # want to see them in the same plot.
       p_grid_g <- expand.grid(p_list$gysnth)
       p_grid_m <- expand.grid(p_list$microsynth)
-      p_grid <- plyr::rbind.fill(p_grid_g, p_grid_m)  # Pads non-shared columns
+      p_grid_a <- expand.grid(p_list$augsynth)
+      p_grid <- plyr::rbind.fill(list(p_grid_g,  # Pads non-shared columns
+                                      p_grid_m, p_grid_a))
     } else {
       p_grid <- expand.grid(p_list, stringsAsFactors = FALSE)
     }

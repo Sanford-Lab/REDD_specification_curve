@@ -7,7 +7,8 @@ library(zoo)
 library(tidyquant)
 library(gsynth)
 library(microsynth)
-
+# devtools::install_github("ebenmichael/augsynth")
+library(augsynth)
 
 execute_method <- function(project_name, start_year, params,
                            outcome_var = "cum_loss") {
@@ -15,17 +16,19 @@ execute_method <- function(project_name, start_year, params,
   # Load the processed dat_long table.
   load(paste0("data/processed/", project_name, "/dat_synth.Rdata"))
   
-  # Prep data, formula for synthetic controls.    
+  # Prep data, formula for synthetic controls.
+  keep_vars <- c("ID", "Y", "D", "year", params$covariates[[1]])
   start_year = as.numeric(start_year)
   synth_dat <- as.data.frame(dat_long) %>% 
     mutate(year = as.numeric(year),
            D = ifelse(treated == 1 & year >= start_year, 1, 0)) %>%
     rename(Y = outcome_var) %>%
-    select(all_of(c("ID", "Y", "D", "year", params$covariates[[1]])))
+    select(all_of(keep_vars))
   
   if (!is.null(params$covariates[[1]])) {
-    form <- as.formula(paste("Y ~ D +", paste(params$covariates[[1]],
-                                              collapse = " + ")))
+    sep <- if (params$sc_method == "augsynth") "|" else "+"
+    form <- as.formula(paste("Y ~ D", sep, paste(params$covariates[[1]],
+                                                 collapse = " + ")))
   } else {
     form <- as.formula("Y ~ D")
   }
@@ -89,8 +92,19 @@ execute_method <- function(project_name, start_year, params,
              upper = coef + 1.96*se) %>%
       select(year, coef, lower, upper)
     
+  } else if (params$sc_method == "augsynth") {
+    
+    out_augsynth <- augsynth(form, unit = ID, time = year, data = synth_dat,
+                             progfunc = params$progfunc, scm = TRUE,
+                             force = params$force)
+    sum_augsynth <- summary(out_augsynth,  # This takes a while! 
+                            inf = TRUE, inf_type = params$inf_type)
+    these_results <- sum_augsynth$att[, 1:4]
+    names(these_results) <- c("year", "coef", "lower", "upper")
+      
+  } else {
+    stop("Set params$sc_method to either: gsynth, microsynth, or augsynth.")
   }
-  
   
   return(these_results)
   
