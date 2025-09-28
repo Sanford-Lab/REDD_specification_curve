@@ -10,15 +10,20 @@ source(here("code", "spec_curve", "create_spec_chart_function.R"))
 
 # Function to add project names into param list for easier looping.
 grid_helper <- function(ind_p_list, projects) {
-  ind_p_list$project <- sapply(projects, function(p) p[1])
-  return(ind_p_list)
+  if (!is.null(ind_p_list)) {
+    ind_p_list$project <- sapply(projects, function(p) p[1])
+    return(ind_p_list)
+  } else {
+    return(NULL)
+  }
 }
 
 
 # Keep a record of current progress (overwrites every time).
-update_log <- function(project_name, grid_row, total) {
+update_log <- function(project_name, grid_row, total, time) {
   write(paste0(Sys.time(), ": Worker ", Sys.getpid(), " finished grid row ",
-               grid_row, "/", total, " for project ", project_name, "."),
+               grid_row, "/", total, " for project ", project_name,
+               " after ", round(time / 60, 2),  " minutes."),
         "data/progress.log", append = TRUE)
 }
 
@@ -71,22 +76,33 @@ make_sc_curves <- function(projects, ate_method, p_list, plot_only = FALSE,
       project <- projects[proj_names == p_grid[i, "project"]][[1]]
       
       # Call method execution function for the given parameter combination.
-      # print(paste0("Starting ", ate_method, " for ", project[1],
-      #              " with parameter setting ", i, "/", nrow(p_grid), "."))
-      ates_by_year <- execute_method(project_name = project[1],
-                                     start_year = as.numeric(project[2]), 
-                                     params = params)
+      start <- proc.time()
+      out <- tryCatch({
+        ates_by_year <- execute_method(project_name = project[1],
+                                       start_year = as.numeric(project[2]), 
+                                       params = params)
+        
+        # Retrieve the ATT, lower and upper CI bounds for the year 2022.
+        # NOTE: May want to make year an input variable, or a project-specific
+        # feature saved in the `projects` list with name and start year.
+        result_2022 <- ates_by_year %>% filter(year == 22)
+        data.frame(project_name = project[1], year = project[2],
+                   ATT = result_2022$coef, lower = result_2022$lower,
+                   upper = result_2022$upper)
+        
+      }, error = function(e) {
+        write(paste0(Sys.time(), ": Error with grid row ", i, "/", nrow(p_grid),
+                     " for project ", project[1], ": ",
+                     conditionMessage(e)),
+              "data/progress.log", append = TRUE)
+        data.frame(project_name = project[1], year = project[2],
+                   ATT = NA, lower = NA, upper = NA)
+      })
+      end <- proc.time() - start
+      update_log(project[1], i, nrow(p_grid),  # Record progress
+                 as.numeric(round(end[3], 2)))  
       
-      update_log(project[1], i, nrow(p_grid))  # Record progress
-      
-      # Retrieve the ATT, lower and upper CI bounds for the year 2022.
-      # NOTE: May want to make year an input variable, or a project-specific
-      # feature saved in the `projects` list with name and start year.
-      result_2022 <- ates_by_year %>% filter(year == 22)
-      
-      return(data.frame(project_name = project[1], year = project[2],
-                        ATT = result_2022$coef, lower = result_2022$lower,
-                        upper = result_2022$upper))
+      return(out)
     }
     
     # Add parameter information back 
@@ -105,6 +121,8 @@ make_sc_curves <- function(projects, ate_method, p_list, plot_only = FALSE,
   for (project in projects) {
     curr_proj_results <- readRDS(paste0("data/results/", ate_method, "/",
                                         project[1], ".rds"))
+    curr_proj_results <- curr_proj_results %>%
+      filter(!is.na(ATT))
     
     # Plot and save specification curve.
     png(paste0("figs/sc/", ate_method, "/", project[1], ".png"),

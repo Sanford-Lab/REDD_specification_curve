@@ -8,7 +8,11 @@ library(tidyquant)
 library(gsynth)
 library(microsynth)
 # devtools::install_github("ebenmichael/augsynth")
+# install_github("susanathey/MCPanel")
 library(augsynth)
+library(randomForest)
+library(glmnet)
+library(MCPanel)
 
 execute_method <- function(project_name, start_year, params,
                            outcome_var = "cum_loss") {
@@ -79,7 +83,8 @@ execute_method <- function(project_name, start_year, params,
                                  match.covar.min = params$covariates[[1]], 
                                  result.var = "Y",  test = "two-sided",
                                  perm = 250, jack = FALSE, check.feas = TRUE,
-                                 use.backup = TRUE, use.survey = FALSE)
+                                 use.backup = TRUE, use.survey = FALSE,
+                                 n.cores = 1)
     
     these_results <- as.data.frame(do.call(rbind, out_microsynth$Results))
     rownames(these_results) <- NULL
@@ -92,6 +97,7 @@ execute_method <- function(project_name, start_year, params,
              upper = coef + 1.96*se) %>%
       select(year, coef, lower, upper)
     
+  ### Augmented synthetic controls logic 
   } else if (params$sc_method == "augsynth") {
     
     out_augsynth <- augsynth(form, unit = ID, time = year, data = synth_dat,
@@ -99,8 +105,16 @@ execute_method <- function(project_name, start_year, params,
                              force = params$force)
     sum_augsynth <- summary(out_augsynth,  # This takes a while! 
                             inf = TRUE, inf_type = params$inf_type)
-    these_results <- sum_augsynth$att[, 1:4]
-    names(these_results) <- c("year", "coef", "lower", "upper")
+    if (ncol(sum_augsynth$att) > 3) {  # CIs returned depending on progfunc
+      these_results <- sum_augsynth$att[, 1:4]
+      names(these_results) <- c("year", "coef", "lower", "upper")
+    } else {
+      these_results <- sum_augsynth$att[, 1:3]
+      names(these_results) <- c("year", "coef", "se")
+      these_results$lower <- these_results$coef - 1.96 * these_results$se
+      these_results$upper <- these_results$coef + 1.96 * these_results$se
+      these_results <- these_results[, c("year", "coef", "lower", "upper")]
+    }
       
   } else {
     stop("Set params$sc_method to either: gsynth, microsynth, or augsynth.")
