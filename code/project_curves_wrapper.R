@@ -4,7 +4,9 @@
 #           Performs all permutations to generate per-project specification
 #           curves for the method, and saves the associated data frames.
 
-library(dplyr)
+if (interactive()) {
+  library(dplyr)
+}
 source(here("code", "spec_curve", "create_spec_chart_function.R"))
 
 

@@ -2,9 +2,12 @@
 # Date: 9/4/2025
 # Function: Cleans CSVs to create dataframe that is conducive for running
 # matching. Saves this data frame as a .Rdata file.
-library(tidyverse)
-library(zoo)
-library(tidyquant)
+
+if (interactive()) {
+  library(tidyverse)
+  library(zoo)
+  library(tidyquant)
+  }
 
 process <- function(project_name, overwrite = FALSE) {
   

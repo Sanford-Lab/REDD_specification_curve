@@ -7,7 +7,9 @@
 # - KML is downloaded from Verra registry and is accurate
 # - KML file is saved in /data/raw/<project_name>/<project_name>.kml
 
-library(sf)
+if (interactive()) {
+  library(sf)
+}
 
 convert_to_shp <- function(project_name) {
   # describe and read in KML

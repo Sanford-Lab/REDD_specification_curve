@@ -2,11 +2,12 @@
 # Date: 12/31/2023 (most recent)
 # Purpose: Runs synthetic controls logic
 
-library(tidyverse)
-library(zoo)
-library(tidyquant)
-library(microsynth)
-
+if (interactive()) {
+  library(tidyverse)
+  library(zoo)
+  library(tidyquant)
+  library(microsynth)
+}
 
 # NOTE: need to add function parameters for all the different things you can tweak for 
 # synthetic controls (i.e. all the different possible combinations of running it)

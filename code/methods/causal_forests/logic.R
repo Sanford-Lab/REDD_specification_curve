@@ -2,14 +2,16 @@
 # Date: 4/10/2024
 # Function:
 
-library(MatchIt)
-library(grf)
-library(estimatr)
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(tidyverse)
-library(here)
+if (interactive()) {
+  library(MatchIt)
+  library(grf)
+  library(estimatr)
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+  library(tidyverse)
+  library(here)
+}
 
 #-------------------------------------------------------------------------------
 # processing the data on all projects

@@ -2,11 +2,13 @@
 # Date: 9/1/2025
 # Function: Function to apply matching methodology to a single project.
 
-library(MatchIt)
-library(estimatr)
-library(ggplot2)
-library(dplyr)
-library(tidyr)
+if (interactive()) {
+  library(MatchIt)
+  library(estimatr)
+  library(ggplot2)
+  library(dplyr)
+  library(tidyr)
+}
 
 
 ### EXAMPLE:

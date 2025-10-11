@@ -3,10 +3,12 @@
 # Function: Cleans CSVs to create dataframe for running synthetic controls.
 # Saves the resulting data frame as a .Rdata file.
 
-library(here)
-library(tidyverse)
-library(zoo)
-library(tidyquant)
+if (interactive()) {
+  library(here)
+  library(tidyverse)
+  library(zoo)
+  library(tidyquant)
+}
 
 process <- function(project_name, overwrite = FALSE) {
   

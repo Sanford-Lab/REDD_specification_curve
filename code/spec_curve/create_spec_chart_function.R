@@ -2,8 +2,10 @@
 # Date: Fall 2023
 # Purpose: 
 
-library(here)
-library(stringr)
+if (interactive()) {
+  library(here)
+  library(stringr)
+}
 
 
 # load base schart function

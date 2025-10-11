@@ -4,13 +4,11 @@
 #           run for specification curves.
 
 rm(list = ls())
-library(here)
-library(doParallel)
+source("code/setup.R")  # Loads packages and grabs functions from other scripts.
 registerDoParallel(cores = 5)
-source(here("code", "project_curves_wrapper.R"))
-source(here('code', 'Projects', 'universal_list_of_projects.R'))
 
 projects <- get_projects()[1:3]
+
 
 ### Uncomment / adjust p_list to run for MATCHING.
 ate_method <- "matching"

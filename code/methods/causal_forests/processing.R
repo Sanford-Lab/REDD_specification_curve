@@ -3,11 +3,13 @@
 # Function: Cleans CSVs to create dataframe that is conducive of running the 
 # causal forests procedure on. saves this data frame as a .Rdata file.
 
-process_forest_data <- function(project_name) {
-
+if (interactive()) {
   library(tidyverse)
   library(zoo)
   library(tidyquant)
+}
+
+process_forest_data <- function(project_name) {
   
   # Define the base file path
   base_path <- paste0("data/raw/", project_name, "/", project_name, "_exp/")

@@ -2,17 +2,19 @@
 # Date: 9/10/2025 (most recent)
 # Purpose: Runs synthetic controls logic
 
-library(tidyverse)
-library(zoo)
-library(tidyquant)
-library(gsynth)
-library(microsynth)
-# devtools::install_github("ebenmichael/augsynth")
-# install_github("susanathey/MCPanel")
-library(augsynth)
-library(randomForest)
-library(glmnet)
-library(MCPanel)
+if (interactive()) {
+  library(tidyverse)
+  library(zoo)
+  library(tidyquant)
+  library(gsynth)
+  library(microsynth)
+  # devtools::install_github("ebenmichael/augsynth")
+  # install_github("susanathey/MCPanel")
+  library(augsynth)
+  library(randomForest)
+  library(glmnet)
+  library(MCPanel)
+}
 
 execute_method <- function(project_name, start_year, params,
                            outcome_var = "cum_loss") {
