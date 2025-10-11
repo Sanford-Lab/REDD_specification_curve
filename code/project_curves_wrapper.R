@@ -64,6 +64,13 @@ make_sc_curves <- function(projects, ate_method, p_list, plot_only = FALSE,
                               stringsAsFactors = FALSE)
       p_grid <- plyr::rbind.fill(list(p_grid_g,  # Pads non-shared columns
                                       p_grid_m, p_grid_a))
+      
+      # Remove parameter combinations that are not useful / implemented in
+      # underlying packages.
+      jk_only <- c("EN", "RF", "seq2seq")
+      p_grid$inf_type[p_grid$progfunc %in% jk_only] <- "jackknife"
+      p_grid <- p_grid[!duplicated(p_grid), ]
+      
     } else if (ate_method == "matching") {
       p_grid <- expand.grid(grid_helper(p_list, projects),
                             stringsAsFactors = FALSE)
