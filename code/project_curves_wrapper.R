@@ -64,6 +64,16 @@ make_sc_curves <- function(projects, ate_method, p_list, plot_only = FALSE,
                               stringsAsFactors = FALSE)
       p_grid <- plyr::rbind.fill(list(p_grid_g,  # Pads non-shared columns
                                       p_grid_m, p_grid_a))
+    } else if (ate_method == "matching") {
+      p_grid <- expand.grid(grid_helper(p_list, projects),
+                            stringsAsFactors = FALSE)
+      
+      # Remove parameter combinations that are not useful (eg where one
+      # parameter will be ignored based on the value of another).
+      p_grid$distance[p_grid$method == "cem"] <- NA
+      p_grid$ratio[p_grid$method == "cem"] <- NA
+      p_grid <- p_grid[!duplicated(p_grid), ]
+      
     } else {
       p_grid <- expand.grid(grid_helper(p_list, projects),
                             stringsAsFactors = FALSE)
