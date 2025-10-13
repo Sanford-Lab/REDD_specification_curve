@@ -7,7 +7,7 @@ rm(list = ls())
 source("code/setup.R")  # Loads packages and grabs functions from other scripts.
 registerDoParallel(cores = 5)
 
-projects <- get_projects()[1:3]
+projects <- get_projects()[1:2]
 
 
 ### Uncomment / adjust p_list to run for MATCHING.
@@ -42,5 +42,5 @@ p_list <- list(method = c("nearest", "cem"),
 # # p_list <- list("augsynth" = p_list_a)
 
 
-make_sc_curves(projects, ate_method, p_list, plot_only = FALSE,
-               leftmargin = 5)
+run_sc_method(projects, ate_method, p_list)   # Runs methods
+make_sc_curves(projects, ate_method, leftmargin = 5)   # Makes SC plots
