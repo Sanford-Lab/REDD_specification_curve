@@ -23,7 +23,8 @@ grid_helper <- function(ind_p_list, projects) {
 }
 
 
-### Creates data frame of parameter grid.
+### Create grid of parameter permutations x projects, to allow parallelization
+### over both parameters and projects, as a data frame.
 create_grid <- function(ate_method, p_list) {
   
   if (ate_method == "synthetic_controls") {
@@ -79,7 +80,8 @@ update_log <- function(project_name, grid_row, total, time) {
 
 
 ### Main wrapper function for running input method across range of parameters.
-run_sc_method <- function(projects, ate_method, p_list) {
+run_sc_method <- function(projects, ate_method, p_grid,
+                          run_type = "interactive") {
   
   # Load processing and logic functions for the given method.
   # NOTE: This means `ate_method` must match the name of the method directory,
@@ -94,10 +96,6 @@ run_sc_method <- function(projects, ate_method, p_list) {
     print(paste0("Finished processing ", project[1], " data for ", ate_method,
                  "."))
   }
-  
-  # Create grid of parameter permutations x projects, to allow parallelization
-  # over both parameters and projects.
-  p_grid <- create_grid(ate_method, p_list)
   
   
   # Iterate through all possible permutations for each project.
@@ -141,13 +139,17 @@ run_sc_method <- function(projects, ate_method, p_list) {
   # Add parameter information back 
   curr_results <- cbind(curr_results, p_grid[, names(p_grid) != "project"])
   
-  # Record all ATT estimates separately for each project.
-  for (project in projects) {
-    these <- curr_results[curr_results$project_name == project[1], ]
-    saveRDS(these, paste0("data/results/", ate_method, "/", project[1],
-                          ".rds"))
+  if (run_type == "interactive") {  # Do not save individual job array results.
+    
+    # Record all ATT estimates separately for each project.
+    for (project in projects) {
+      these <- curr_results[curr_results$project_name == project[1], ]
+      saveRDS(these, paste0("data/results/", ate_method, "/", project[1],
+                            ".rds"))
+    }
   }
   
+  invisible(curr_results)
 }
 
 

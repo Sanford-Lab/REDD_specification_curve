@@ -5,10 +5,24 @@
 
 rm(list = ls())
 source("code/setup.R")  # Loads packages and grabs functions from other scripts.
-registerDoParallel(cores = 5)
 
-projects <- get_projects()[1:2]
 
+# ----- STEP 1: Set computational parameters ----------------------------------
+run_type <- "job array"   # Set to either "interactive" or "job array"
+n_cores <- 3                # Number of cores per job / on the local machine
+
+
+# Only worry about these if run_type == "job array".
+gb_per_core <- 1
+time <- "00:10:00"
+rows_per_job <- 300
+
+
+# ----- STEP 2: Set list of projects to consider ------------------------------
+projects <- get_projects()
+
+
+# ----- STEP 3: Set the method and list of parameter settings -----------------
 
 ### Uncomment / adjust p_list to run for MATCHING.
 ate_method <- "matching"
@@ -18,7 +32,19 @@ p_list <- list(method = c("nearest", "cem"),
                covariates = list(c("treecover_past", "accessibility",
                                    "accessibility_walking_only", "aspect",
                                    "elevation", "slope"),
-                                 c("treecover_past", "accessibility")))
+                                 c("treecover_past", "accessibility",
+                                   "accessibility_walking_only", "aspect",
+                                   "elevation"),
+                                 c("treecover_past", "accessibility",
+                                   "accessibility_walking_only", "aspect",
+                                   "slope"),
+                                 c("treecover_past", "aspect",
+                                   "elevation", "slope"),
+                                 c("accessibility",
+                                   "accessibility_walking_only", "aspect",
+                                   "elevation", "slope"),
+                                 c("accessibility",
+                                   "accessibility_walking_only")))
 
 
 ### Uncomment / adjust p_list to run for SYNTHETIC CONTROLS.
@@ -39,8 +65,79 @@ p_list <- list(method = c("nearest", "cem"),
 #                  force = c("none", "two-way"))
 # p_list <- list("gysnth" = p_list_g, "microsynth" = p_list_m,
 #                "augsynth" = p_list_a)
-# # p_list <- list("augsynth" = p_list_a)
+
+# ----- STEP 4: Run this code to run the method across parameters/projects ----
+
+p_grid <- create_grid(ate_method, p_list)  # Creates parameter grid
+
+if (run_type == "job array") {
+  job_list_file <- paste0("data/results/", ate_method, "/job_list.txt")
+  n_jobs <- ceiling(nrow(p_grid) / rows_per_job)
+}
 
 
-run_sc_method(projects, ate_method, p_list)   # Runs methods
-make_sc_curves(projects, ate_method, leftmargin = 5)   # Makes SC plots
+### Run the method across the entire grid if running interactively.
+if (run_type == "interactive") {
+  registerDoParallel(cores = n_cores)
+  run_sc_method(projects, ate_method, p_grid)   # Runs methods
+
+
+### Or, initialize a job array run.
+### *** Job array must be run via terminal, follow the printed instructions.***
+} else {
+  
+  saveRDS(list(p_grid = p_grid, projects = projects),  # Save grid for jobs.
+          paste0("data/results/", ate_method, "/param_grid.rds"))
+  
+  # Create job list. 
+  base_str <- "Rscript --vanilla code/job_array_run.R"
+  job_list <- ""
+  for (i in 1:n_jobs) {
+    start <- (i - 1) * rows_per_job + 1
+    end <- min(rows_per_job * i, nrow(p_grid))
+    this <- paste0(base_str, " \"", ate_method, "\" ", start, " ", end,
+                   " ", n_cores, "\n")
+    job_list <- paste0(job_list, this)
+  }
+  write(job_list, job_list_file)
+  dir.create(paste0("data/results/", ate_method, "/job_array_results"))
+  
+  # To create dSQ sh file using this job list:
+  #   1. Run the next line in the cluster terminal:
+  cat(paste0("\ndsq --job-file ", job_list_file, "--mem-per-cpu ",
+             gb_per_core, "g -t ", time, " --cpus-per-task ", n_cores + 1,
+             " --partition day\n"))
+  #   2. Then sbatch the sh script created by that command in the terminal. 
+    
+}
+
+
+# ----- STEP 5: Run this code to make project specification curves ------------
+
+if (run_type == "job array") {
+  
+  job_res_files <- list.files(paste0("data/results/", ate_method,
+                                     "/job_array_results/"), full.names = TRUE)
+  job_res_files <- grep("\\.rds", job_res_files, value = TRUE)
+  
+  # Stitch job array results together.
+  if (length(job_res_files) == n_jobs) {
+    all_results <- readRDS(job_res_files[1])
+    for (f in job_res_files[2:length(job_res_files)]) {
+      all_results <- rbind(all_results,
+                           readRDS(f))
+    }
+  }
+  
+  # Save results for each project - across all parameters - separately.
+  for (project in projects) {
+    these <- all_results[all_results$project_name == project[1], ]
+    saveRDS(these, paste0("data/results/", ate_method, "/", project[1],
+                          ".rds"))
+  }
+  
+}
+
+# Generate specification curves across projects.
+make_sc_curves(projects, ate_method, leftmargin = 5)
+
