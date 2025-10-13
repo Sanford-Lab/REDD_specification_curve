@@ -20,13 +20,6 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   
   for (col in label_colnames) {
     
-    # Handle NAs.
-    if (anyNA(results[, col])) {
-      results[, col] <- as.character(results[, col])
-      results[, col] <- ifelse(is.na(results[, col]), "NA",
-                               results[, col])
-    }
-    
     # Handle vector-valued parameters
     if (class(results[, col]) == "list") {
       results[, col] <- sapply(1:nrow(results), function(i) {
@@ -43,19 +36,32 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
                                      as.numeric(factor(results[these, col])))
       }
     }
+    
+    results[, col] <- as.character(results[, col])
+
   }
+  
+  results <- results %>%  # Sort labels
+    arrange(across(all_of(label_colnames)))
+  
+  # Handle NAs.
+  for (col in label_colnames) {
+    if (anyNA(results[, col])) {
+      results[, col] <- ifelse(is.na(results[, col]), "NA",
+                               results[, col])
+    }
+  }
+  
   
   
   these_results <- results %>% distinct %>%
     rowid_to_column("ID")
   
   labels <- c()
-  for(col in label_colnames){
+  for (col in label_colnames) {
     labelname <- col
     
-    labels <- c(labels,
-                unique(results[col])
-    )
+    labels <- c(labels, unique(results[col]))
     
     these_results <- these_results %>%
       mutate("TRUE" = TRUE) %>% 

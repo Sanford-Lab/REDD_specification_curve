@@ -59,6 +59,11 @@ create_grid <- function(ate_method, p_list) {
                           stringsAsFactors = FALSE)
   }
   
+  # Shuffle rows of the grid - this helps keep runtime between jobs in the
+  # job array roughly similar.
+  set.seed(1013)
+  p_grid <- p_grid[sample(1:nrow(p_grid)), ]
+  
   return(p_grid)
   
 }
