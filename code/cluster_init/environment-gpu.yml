@@ -1,0 +1,27 @@
+name: r-geo-gpu
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  # R and core packages 4.2 for MCPanel compatibility
+  - r-base=4.2
+  - r-essentials
+  - r-devtools
+
+  # Pin GCC 12 for MCPanel Eigen compatibility
+  - gcc_linux-64=12.3
+  - gxx_linux-64=12.3
+  - gfortran_linux-64=12.3
+
+  # Geospatial libraries with version-pinned r-sf for R 4.2 compatibility
+  - gdal
+  - geos
+  - proj
+  - udunits2
+  - r-units
+  - r-s2
+  - r-sf>=1.0_14  # Forces recent r42 build with modern proj
+
+  # Deep learning
+  - r-keras
+  - tensorflow-gpu
