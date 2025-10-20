@@ -55,6 +55,7 @@ p_list <- list(method = c("nearest", "cem"),
 # p_list <- list("gysnth" = p_list_g, "microsynth" = p_list_m,
 #                "augsynth" = p_list_a)
 
+
 # ----- STEP 4: Run this code to run the method across parameters/projects ----
 
 p_grid <- create_grid(ate_method, p_list)  # Creates parameter grid
@@ -79,7 +80,7 @@ if (run_type == "interactive") {
           paste0("data/results/", ate_method, "/param_grid.rds"))
   
   # Create job list. 
-  base_str <- "Rscript --vanilla code/job_array_run.R"
+  base_str <- "ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R"
   job_list <- ""
   for (i in 1:n_jobs) {
     start <- (i - 1) * rows_per_job + 1
@@ -90,18 +91,33 @@ if (run_type == "interactive") {
   }
   write(job_list, job_list_file)
   dir.create(paste0("data/results/", ate_method, "/job_array_results"))
-  
-  # To create dSQ sh file using this job list:
-  #   1. Run the next line in the cluster terminal:
-  cat(paste0("\ndsq --job-file ", job_list_file, "--mem-per-cpu ",
-             gb_per_core, "g -t ", time, " --cpus-per-task ", n_cores + 1,
-             " --partition day\n"))
-  #   2. Then sbatch the sh script created by that command in the terminal. 
-    
 }
 
 
-# ----- STEP 5: Run this code to make project specification curves ------------
+# ----- STEP 5: (JOB ARRAY ONLY) Run job array from terminal ------------------
+
+# (a) Open shell terminal on Bouchet. 
+
+# (b) Navigate to this project directory.
+
+# (c) Load the dSQ module by running: `ml dSQ`
+
+# (d) Create the dSQ shell file using the job list created above by running the
+#     result printed by this line:
+cat(paste0("\ndsq --job-file ", job_list_file, " --mem-per-cpu ",
+           gb_per_core, "g -t ", time, " --cpus-per-task ", n_cores + 1,
+           " --partition day ",
+           "--batch-file cluster_logs/dsq-jobfile-", substr(Sys.time(), 1, 10),
+           ".sh ", "--output cluster_logs/dsq-jobfile-%A_%a-%N.out ",
+           "--status-dir cluster_logs/ ", "\n"))
+dir.create("cluster_logs")
+
+# (e) Then sbatch the sh script created by that command (follow the instructions
+#     that the last command gave you in the terminal.)
+
+
+
+# ----- STEP 6: Run this code to make project specification curves ------------
 
 if (run_type == "job array") {
   
