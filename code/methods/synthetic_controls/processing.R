@@ -4,7 +4,6 @@
 # Saves the resulting data frame as a .Rdata file.
 
 if (interactive()) {
-  library(here)
   library(tidyverse)
   library(zoo)
   library(tidyquant)

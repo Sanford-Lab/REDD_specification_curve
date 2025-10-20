@@ -3,13 +3,12 @@
 # Purpose: 
 
 if (interactive()) {
-  library(here)
   library(stringr)
 }
 
 
 # load base schart function
-source(here::here("code", "Spec_Curve", "schart_ortiz.R"))
+source("code/spec_curve/schart_ortiz.R")
 
 create_spec_chart <- function(project_name, results, spec_order = "asis",
                               color = "black", leftmargin = 7) {

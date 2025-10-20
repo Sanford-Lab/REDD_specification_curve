@@ -7,6 +7,13 @@ if (!"augsynth" %in% installed.packages()) {
   devtools::install_github("ebenmichael/augsynth") 
 }
 
+# Install MCPanel, which isn't on CRAN:
+# (NOTE: On the cluster, follow code/cluster_init/instructions.md to install
+#  MCPanel before this point. This should work on local machines, though.)
+if (!"augsynth" %in% installed.packages()) {
+  devtools::install_github("susanathey/MCPanel", force=TRUE)
+}
+
 # For installing gsynth properly given this version of R:
 if (!"gsynth" %in% installed.packages()) {
   remotes::install_version("ggplot2", version = "3.4.4")
@@ -14,7 +21,7 @@ if (!"gsynth" %in% installed.packages()) {
   install.packages("gsynth")
 }
 
-packages <- c("augsynth", "here", "doParallel", "estimatr", "ggplot2", "glmnet",
+packages <- c("augsynth", "doParallel", "estimatr", "ggplot2", "glmnet",
               "grf", "gsynth", "MatchIt", "MCPanel", "microsynth",
               "randomForest", "sf", "stringr", "tidyr", "tidyverse", 
               "tidyquant", "zoo", "dplyr")
@@ -27,6 +34,6 @@ if (length(to_install) > 0) install.packages(to_install)
 invisible(lapply(packages, library, character.only = TRUE))
 
 # Load helper functions
-source(here("code", "project_curves_wrapper.R"))
-source(here('code', 'Projects', 'universal_list_of_projects.R'))
+source("code/project_curves_wrapper.R")
+source("code/projects/universal_list_of_projects.R")
 

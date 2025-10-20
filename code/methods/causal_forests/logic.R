@@ -10,18 +10,17 @@ if (interactive()) {
   library(dplyr)
   library(tidyr)
   library(tidyverse)
-  library(here)
 }
 
 #-------------------------------------------------------------------------------
 # processing the data on all projects
 
 # get a list of all (project_name, start_year)
-source(here('code', 'Projects', 'universal_list_of_projects.R'))
+source("code/projects/universal_list_of_projects.R")
 projects <- get_projects()
 
 # process the datasets from all projects:
-source(here("code", "methods", "causal_forests", "processing.R"))
+source("code/methods/causal_forests/processing.R")
 for (project in projects) {process_forest_data(project[1])}
 
 #-------------------------------------------------------------------------------
@@ -121,7 +120,7 @@ for (project in projects) {
 # Plotting the results:
 
 # load matching spec curve function
-source(here("code", "spec_curve", "create_spec_chart_function.R"))
+source("code/spec_curve/create_spec_chart_function.R")
 
 # return matching specification curve but looped.
 for (i in 1:length(projects)) {

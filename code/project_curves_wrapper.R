@@ -9,7 +9,7 @@
 if (interactive()) {
   library(dplyr)
 }
-source(here("code", "spec_curve", "create_spec_chart_function.R"))
+source("code/spec_curve/create_spec_chart_function.R")
 
 
 ### Function to add project names into param list for easier looping.
@@ -87,8 +87,8 @@ run_sc_method <- function(projects, ate_method, p_grid,
   # NOTE: This means `ate_method` must match the name of the method directory,
   # and each directory must have files with these specific names, containing
   # functions named exactly `process()` and `execute_method()`.
-  source(here("code", "methods", ate_method, "processing.R"))
-  source(here("code", "methods", ate_method, "logic.R"))
+  source(paste0("code/methods/", ate_method, "/processing.R"))
+  source(paste0("code/methods/", ate_method, "/logic.R"))
   
   # Process all project data sets.
   for (project in projects) {

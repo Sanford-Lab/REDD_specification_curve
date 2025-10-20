@@ -24,27 +24,18 @@ projects <- get_projects()
 
 # ----- STEP 3: Set the method and list of parameter settings -----------------
 
+all_covars <- c("treecover_past", "accessibility", "accessibility_walking_only",
+                "aspect", "elevation", "slope")
+loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
+
+
 ### Uncomment / adjust p_list to run for MATCHING.
 ate_method <- "matching"
+
 p_list <- list(method = c("nearest", "cem"),
                distance = c("logit", "mahalanobis", "euclidean"),
                ratio = c(1, 3, 5),
-               covariates = list(c("treecover_past", "accessibility",
-                                   "accessibility_walking_only", "aspect",
-                                   "elevation", "slope"),
-                                 c("treecover_past", "accessibility",
-                                   "accessibility_walking_only", "aspect",
-                                   "elevation"),
-                                 c("treecover_past", "accessibility",
-                                   "accessibility_walking_only", "aspect",
-                                   "slope"),
-                                 c("treecover_past", "aspect",
-                                   "elevation", "slope"),
-                                 c("accessibility",
-                                   "accessibility_walking_only", "aspect",
-                                   "elevation", "slope"),
-                                 c("accessibility",
-                                   "accessibility_walking_only")))
+               covariates = loo_covars)
 
 
 ### Uncomment / adjust p_list to run for SYNTHETIC CONTROLS.
@@ -54,12 +45,10 @@ p_list <- list(method = c("nearest", "cem"),
 #                  estimator = c("ife"),
 #                  r = c(1, 3, 5, "cv"))
 # p_list_m <- list(sc_method = "microsynth",
-#                  covariates = list(c("treecover_2000", "hillshade", "aspect",
-#                                      "elevation", "slope"),
-#                                    c("elevation", "slope")))
+#                  covariates = loo_covars)
 # p_list_a <- list(sc_method = "augsynth",
 #                  inf_type = c("conformal", "jackknife"),
-#                  covariates = list(c("elevation", "slope")),
+#                  covariates = loo_covars,
 #                  progfunc = c("None", "EN", "Ridge", "RF", "MCP", "CITS",
 #                               "seq2seq"),
 #                  force = c("none", "two-way"))

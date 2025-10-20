@@ -3,12 +3,8 @@
 # Purpose: Runs all the KML -> SHP file conversions so we don't need all the 12
 # folders for each project.
 
-if (interactive()) {
-  library(here)
-}
-
-source(here("code", "projects", "convert_to_shp_function.R"))
-source(here("code", "projects", "universal_list_of_projects.R"))
+source("code/projects/convert_to_shp_function.R")
+source("code/projects/universal_list_of_projects.R")
 
 
 # to contribute a new project, just simply add the relevant KML files inside the
