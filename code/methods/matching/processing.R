@@ -37,14 +37,15 @@ process <- function(project_name, overwrite = FALSE) {
     loss <- read_csv(paste0(base_path, "/loss_", sprintf("%02d", i+2000), "_",
                             project_name, "_points.csv"),
                      show_col_types = FALSE) %>% 
-      select(-c(".geo")) %>% 
+      select(-c(".geo")) %>%
+      select(ID, sum) %>%
       rename(!!paste0("loss_", sprintf("%02d", i)) := "sum")
     dat <- dat %>% left_join(loss, by = "ID")
   }
   
   locations <- read_csv(paste0(base_path, "/points_with_mean_citydist.csv"),
                         show_col_types = FALSE) %>% 
-    select(-c(".geo"))
+    select(-c(".geo", "system:index", "treated"))
   
   dat <- dat %>% left_join(locations, by = "ID")
   
@@ -56,7 +57,8 @@ process <- function(project_name, overwrite = FALSE) {
                                         names_to = "year",
                                         names_prefix = "distance_",
                                         values_to = "defo_distance") %>%
-    mutate(year = as.numeric(year))
+    mutate(year = as.numeric(year)) %>%
+    select(ID, year, defo_distance)
   
   dat_long <- dat %>% pivot_longer(cols = starts_with("loss_"),
                                    names_to = "year",

@@ -18,11 +18,7 @@ time <- "00:10:00"
 rows_per_job <- 300
 
 
-# ----- STEP 2: Set list of projects to consider ------------------------------
-projects <- get_projects()
-
-
-# ----- STEP 3: Set the method and list of parameter settings -----------------
+# ----- STEP 2: Set the method and list of parameter settings -----------------
 
 all_covars <- c("treecover_past", "accessibility", "accessibility_walking_only",
                 "aspect", "elevation", "slope")
@@ -32,7 +28,7 @@ loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
 ### Uncomment / adjust p_list to run for MATCHING.
 ate_method <- "matching"
 
-p_list <- list(method = c("nearest", "cem"),
+p_list <- list(method = c("nearest", "cem", "genetic"),
                distance = c("logit", "mahalanobis", "euclidean"),
                ratio = c(1, 3, 5),
                covariates = loo_covars)
@@ -54,6 +50,20 @@ p_list <- list(method = c("nearest", "cem"),
 #                  force = c("none", "two-way"))
 # p_list <- list("gysnth" = p_list_g, "microsynth" = p_list_m,
 #                "augsynth" = p_list_a)
+
+
+
+# ----- STEP 3: Set list of projects to consider and process ------------------
+projects <- get_projects()
+
+
+# Process all project data sets.
+source(paste0("code/methods/", ate_method, "/processing.R"))
+for (project in projects) {
+  process(project[1], overwrite = FALSE)
+  print(paste0("Finished processing ", project[1], " data for ", ate_method,
+               "."))
+}
 
 
 # ----- STEP 4: Run this code to run the method across parameters/projects ----

@@ -22,8 +22,8 @@ if (!"gsynth" %in% installed.packages()) {
 }
 
 packages <- c("augsynth", "doParallel", "estimatr", "ggplot2", "glmnet",
-              "grf", "gsynth", "MatchIt", "MCPanel", "microsynth",
-              "randomForest", "sf", "stringr", "tidyr", "tidyverse", 
+              "grf", "gsynth", "Matching", "MatchIt", "MCPanel", "microsynth",
+              "randomForest", "rgenoud", "sf", "stringr", "tidyr", "tidyverse", 
               "tidyquant", "zoo", "dplyr")
 
 # Install any missing packages.
@@ -32,6 +32,7 @@ if (length(to_install) > 0) install.packages(to_install)
 
 # Load all
 invisible(lapply(packages, library, character.only = TRUE))
+select <- dplyr::select
 
 # Load helper functions
 source("code/project_curves_wrapper.R")

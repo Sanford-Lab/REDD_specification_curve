@@ -83,20 +83,11 @@ update_log <- function(project_name, grid_row, total, time) {
 run_sc_method <- function(projects, ate_method, p_grid,
                           run_type = "interactive") {
   
-  # Load processing and logic functions for the given method.
+  # Load logic function for the given method.
   # NOTE: This means `ate_method` must match the name of the method directory,
-  # and each directory must have files with these specific names, containing
-  # functions named exactly `process()` and `execute_method()`.
-  source(paste0("code/methods/", ate_method, "/processing.R"))
+  # and each directory must have a file with this specific names, containing
+  # a function named exactly `execute_method()`.
   source(paste0("code/methods/", ate_method, "/logic.R"))
-  
-  # Process all project data sets.
-  for (project in projects) {
-    process(project[1])
-    print(paste0("Finished processing ", project[1], " data for ", ate_method,
-                 "."))
-  }
-  
   
   # Iterate through all possible permutations for each project.
   write("", file = "data/progress.log")
