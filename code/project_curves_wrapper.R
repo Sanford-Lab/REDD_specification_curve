@@ -91,7 +91,7 @@ create_grid <- function(ate_method, p_list, time_vars = NULL) {
     p_grid <- p_grid %>%
       mutate(group = do.call(paste, lapply(p_grid[time_vars], as.character))) %>%
       group_by(group) %>%
-      mutate(idx = row_number()) %>%
+      mutate(idx = row_number() / n()) %>%
       ungroup()
     
     p_grid <- p_grid %>%

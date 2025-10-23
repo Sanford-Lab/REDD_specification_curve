@@ -13,9 +13,9 @@ n_cores <- 1                # Number of cores per job / on the local machine
 
 
 # Only worry about these if run_type == "job array".
-gb_per_core <- 2
-time <- "02:45:00"
-rows_per_job <- 10
+gb_per_core <- 5
+time <- "03:00:00"
+rows_per_job <- 13
 
 
 # ----- STEP 2: Set the method and list of parameter settings -----------------
@@ -26,31 +26,30 @@ loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
 
 
 ### Uncomment / adjust p_list to run for MATCHING.
-ate_method <- "matching"
-
-p_list <- list(method = c("nearest", "cem", "genetic"),
-               distance = c("logit", "mahalanobis", "euclidean"),
-               pop.size = c(50, 100, 500),
-               ratio = c(1, 3, 5),
-               covariates = loo_covars)
+# ate_method <- "matching"
+# 
+# p_list <- list(method = c("nearest", "cem", "genetic"),
+#                distance = c("logit", "mahalanobis", "euclidean"),
+#                pop.size = c(50, 100, 500),
+#                ratio = c(1, 3, 5),
+#                covariates = loo_covars)
 
 
 ### Uncomment / adjust p_list to run for SYNTHETIC CONTROLS.
-# ate_method <- "synthetic_controls"
-# p_list_g <- list(sc_method = "gsynth",
-#                  force = c("none", "unit", "time", "two-way"),
-#                  estimator = c("ife"),
-#                  r = c(1, 3, 5, "cv"))
-# p_list_m <- list(sc_method = "microsynth",
-#                  covariates = loo_covars)
-# p_list_a <- list(sc_method = "augsynth",
-#                  inf_type = c("conformal", "jackknife"),
-#                  covariates = loo_covars,
-#                  progfunc = c("None", "EN", "Ridge", "RF", "MCP", "CITS",
-#                               "seq2seq"),
-#                  force = c("none", "two-way"))
-# p_list <- list("gysnth" = p_list_g, "microsynth" = p_list_m,
-#                "augsynth" = p_list_a)
+ate_method <- "synthetic_controls"
+p_list_g <- list(sc_method = "gsynth",
+                 force = c("none", "unit", "time", "two-way"),
+                 estimator = c("ife"),
+                 r = c(1, 3, 5, "cv"))
+p_list_m <- list(sc_method = "microsynth",
+                 covariates = loo_covars)
+p_list_a <- list(sc_method = "augsynth",
+                 inf_type = c("conformal", "jackknife"),
+                 covariates = loo_covars,
+                 progfunc = c("None", "EN", "Ridge", "RF", "MCP", "CITS",
+                              "seq2seq"))
+p_list <- list("gysnth" = p_list_g, "microsynth" = p_list_m,
+               "augsynth" = p_list_a)
 
 
 
@@ -70,7 +69,14 @@ for (project in projects) {
 # ----- STEP 4: Run this code to run the method across parameters/projects ----
 
 p_grid <- create_grid(ate_method, p_list,  # Creates parameter grid
-                      time_vars = c("method", "pop.size"))  
+                      time_vars = c("sc_method"))
+
+
+# !*!*!* Just for calibrating job array resource request, remove later. !*!*!*
+p_grid <- p_grid[p_grid$project == "manoa", ]
+p_grid <- p_grid[c(1:3, 5, 6, 9, 11, 13, 16, 17, 27, 36, 65), ]
+# *****
+
 
 if (run_type == "job array") {
   job_list_file <- paste0("data/results/", ate_method, "/job_list.txt")
