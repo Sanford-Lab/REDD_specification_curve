@@ -40,7 +40,8 @@ execute_method <- function(project_name, start_year, params) {
   form <- as.formula(paste("treated ~", paste(params$covariates[[1]],
                                               collapse = " + ")))
   m_out <- matchit(formula = form, data = dat_long_past, method = params$method, 
-                   distance = params$distance, ratio = params$ratio)
+                   distance = params$distance, ratio = params$ratio,
+                   pop.size = params$pop.size)
   m_data <- match.data(m_out)
   
   

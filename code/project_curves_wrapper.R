@@ -12,6 +12,26 @@ if (interactive()) {
 source("code/spec_curve/create_spec_chart_function.R")
 
 
+### Function to avoid overwriting grid/job array files accidentally.
+safe_write <- function(obj, file, overwrite = FALSE) {
+  if (file.exists(file) && !overwrite) {
+    ans <- readline(paste0("File '", file,
+                           "' already exists. Overwrite? [y/N] "))
+    if (!tolower(ans) %in% c("y","yes")) {
+      message("Aborted: file not overwritten.")
+      return(invisible(FALSE))
+    }
+  }
+  
+  if (grepl("\\.txt", file)) {
+    write(obj, file)
+  } else {
+    saveRDS(obj, file)
+  }
+  return(invisible(TRUE))
+}
+
+
 ### Function to add project names into param list for easier looping.
 grid_helper <- function(ind_p_list, projects) {
   if (!is.null(ind_p_list)) {
@@ -25,7 +45,7 @@ grid_helper <- function(ind_p_list, projects) {
 
 ### Create grid of parameter permutations x projects, to allow parallelization
 ### over both parameters and projects, as a data frame.
-create_grid <- function(ate_method, p_list) {
+create_grid <- function(ate_method, p_list, time_vars = NULL) {
   
   if (ate_method == "synthetic_controls") {
     # Different flavors of synthetic controls need different parameters, but
@@ -53,6 +73,7 @@ create_grid <- function(ate_method, p_list) {
     # parameter will be ignored based on the value of another).
     p_grid$distance[p_grid$method == "cem"] <- NA
     p_grid$ratio[p_grid$method == "cem"] <- NA
+    p_grid$pop.size[p_grid$method != "genetic"] <- NA
     p_grid <- p_grid[!duplicated(p_grid), ]
     
   } else {
@@ -60,11 +81,26 @@ create_grid <- function(ate_method, p_list) {
                           stringsAsFactors = FALSE)
   }
   
-  # Shuffle rows of the grid - this helps keep runtime between jobs in the
-  # job array roughly similar.
+
+  # Shuffle, create groups of combinations based on their expected run time, and 
+  # distribute these throughout the grid to help keep run time even across jobs.
   set.seed(1013)
   p_grid <- p_grid[sample(1:nrow(p_grid)), ]
   
+  if (!is.null(time_vars)) {
+    p_grid <- p_grid %>%
+      mutate(group = do.call(paste, lapply(p_grid[time_vars], as.character))) %>%
+      group_by(group) %>%
+      mutate(idx = row_number()) %>%
+      ungroup()
+    
+    p_grid <- p_grid %>%
+      arrange(idx, factor(group, levels = unique(p_grid$group))) %>%
+      select(-idx) %>%
+      select(-group)
+  }
+
+  p_grid <- as.data.frame(p_grid)
   return(p_grid)
   
 }
@@ -155,7 +191,7 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5) {
     
     # Plot and save specification curve.
     png(paste0("figs/sc/", ate_method, "/", project[1], ".png"),
-        width = 800, height = 800)
+        width = 1000, height = 1000)
     create_spec_chart(project_name = project[1], results = curr_proj_results, 
                       spec_order = "increasing", color = "royalblue",
                       leftmargin = leftmargin)

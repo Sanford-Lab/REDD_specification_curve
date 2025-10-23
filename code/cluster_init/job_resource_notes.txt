@@ -1,0 +1,13 @@
+MATCHING:
+
+Each task (param setting x project case) takes a very variable amount of time,
+because genetic matching is much much slower than CEM or NN matching, especially
+for large values of pop.size (~30 minutes vs 5 seconds)
+
+This makes within-job parallelization inefficient for jobs with a smaller number
+of tasks (a couple cores get stuck with finishing long computations while the
+others are idle), but many tasks per job results in longer jobs where monitoring
+and debugging is less flexible. 
+
+Therefore I recommend something like: 10 tasks per job, 2 hr 15 minutes per job,
+just one core per job with 2 GB. 

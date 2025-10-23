@@ -9,13 +9,13 @@ source("code/setup.R")  # Loads packages and grabs functions from other scripts.
 
 # ----- STEP 1: Set computational parameters ----------------------------------
 run_type <- "job array"   # Set to either "interactive" or "job array"
-n_cores <- 3                # Number of cores per job / on the local machine
+n_cores <- 1                # Number of cores per job / on the local machine
 
 
 # Only worry about these if run_type == "job array".
-gb_per_core <- 1
-time <- "00:10:00"
-rows_per_job <- 300
+gb_per_core <- 2
+time <- "02:45:00"
+rows_per_job <- 10
 
 
 # ----- STEP 2: Set the method and list of parameter settings -----------------
@@ -30,6 +30,7 @@ ate_method <- "matching"
 
 p_list <- list(method = c("nearest", "cem", "genetic"),
                distance = c("logit", "mahalanobis", "euclidean"),
+               pop.size = c(50, 100, 500),
                ratio = c(1, 3, 5),
                covariates = loo_covars)
 
@@ -68,7 +69,8 @@ for (project in projects) {
 
 # ----- STEP 4: Run this code to run the method across parameters/projects ----
 
-p_grid <- create_grid(ate_method, p_list)  # Creates parameter grid
+p_grid <- create_grid(ate_method, p_list,  # Creates parameter grid
+                      time_vars = c("method", "pop.size"))  
 
 if (run_type == "job array") {
   job_list_file <- paste0("data/results/", ate_method, "/job_list.txt")
@@ -85,9 +87,8 @@ if (run_type == "interactive") {
 ### Or, initialize a job array run.
 ### *** Job array must be run via terminal, follow the printed instructions.***
 } else {
-  
-  saveRDS(list(p_grid = p_grid, projects = projects),  # Save grid for jobs.
-          paste0("data/results/", ate_method, "/param_grid.rds"))
+  safe_write(list(p_grid = p_grid, projects = projects),  # Save grid for jobs.
+             paste0("data/results/", ate_method, "/param_grid.rds"))
   
   # Create job list. 
   base_str <- "ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R"
@@ -99,7 +100,7 @@ if (run_type == "interactive") {
                    " ", n_cores, "\n")
     job_list <- paste0(job_list, this)
   }
-  write(job_list, job_list_file)
+  safe_write(job_list, job_list_file)
   dir.create(paste0("data/results/", ate_method, "/job_array_results"))
 }
 
@@ -115,21 +116,31 @@ if (run_type == "interactive") {
 # (d) Create the dSQ shell file using the job list created above by running the
 #     result printed by this line:
 cat(paste0("\ndsq --job-file ", job_list_file, " --mem-per-cpu ",
-           gb_per_core, "g -t ", time, " --cpus-per-task ", n_cores + 1,
+           gb_per_core, "g -t ", time, " --cpus-per-task ", n_cores,
            " --partition day ",
-           "--batch-file cluster_logs/dsq-jobfile-", substr(Sys.time(), 1, 10),
+           "--batch-file data/results/", ate_method, "/dsq-jobfile-",
+           substr(Sys.time(), 1, 10),
            ".sh ", "--output cluster_logs/dsq-jobfile-%A_%a-%N.out ",
            "--status-dir cluster_logs/ ", "\n"))
 dir.create("cluster_logs")
 
 # (e) Then sbatch the sh script created by that command (follow the instructions
-#     that the last command gave you in the terminal.)
+#     that the last command gave you in the terminal.) You can check on the
+#     job array status by running `squeue --me`.
 
 
 
 # ----- STEP 6: Run this code to make project specification curves ------------
 
 if (run_type == "job array") {
+  
+  job_list <- readLines(paste0("data/results/", ate_method, "/job_list.txt"))
+  
+  # Save a copy of the full job list - will update job_list.txt to rerun any
+  # failed jobs.
+  if (!file.exists(paste0("data/results/", ate_method, "/job_list_all.txt"))) {
+    write(job_list, paste0("data/results/", ate_method, "/job_list_all.txt"))
+  }
   
   job_res_files <- list.files(paste0("data/results/", ate_method,
                                      "/job_array_results/"), full.names = TRUE)
@@ -142,6 +153,13 @@ if (run_type == "job array") {
       all_results <- rbind(all_results,
                            readRDS(f))
     }
+  } else {
+    job_list <- job_list[job_list != ""]
+    jobs <- sapply(strsplit(job_list, " "), function(s) s[10])
+    completes <- gsub(".*\\/([0-9]+)-[0-9]+\\.rds", "\\1", job_res_files)
+    job_list <- job_list[which(!jobs %in% completes)]
+    write(job_list, paste0("data/results/", ate_method, "/job_list.txt"))
+    stop("Some jobs did not complete. The job list has been updated - repeat Step 5 after adjusting compute parameters in Step 1 if necessary.")
   }
   
   # Save results for each project - across all parameters - separately.

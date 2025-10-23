@@ -204,8 +204,8 @@ schart <- function(data, labels=NA, highlight=NA, n=1, index.est=1, index.se=2, 
     colvec  <- ifelse(colnames(tab) %in% paste(highlight), col.est[2], col.est[1])
     bg.colvec  <- ifelse(colnames(tab) %in% paste(highlight), bg.est[2], bg.est[1])
     colvec2 <- ifelse(colnames(tab) %in% paste(highlight),col.est2[2], col.est2[1])
-    if (horizontal)   plot(est, xlab="", ylab="", axes=F, type="n", ylim=ylim, xlim=xlim)
-    if (!horizontal)  plot(est, xlab="", ylab="", axes=F, type="n", ylim=xlim, xlim=ylim)
+    if (horizontal)   plot(est, xlab="", ylab="", xaxt = "n", type="n", ylim=ylim, xlim=xlim)
+    if (!horizontal)  plot(est, xlab="", ylab="", yaxt = "n", type="n", ylim=xlim, xlim=ylim)
     # Band if present
     if (!is.na(band.ref[1])) {
       if (horizontal) {
