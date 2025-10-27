@@ -20,14 +20,12 @@ rows_per_job <- 13
 
 # ----- STEP 2: Set the method and list of parameter settings -----------------
 
-all_covars <- c("treecover_past", "accessibility", "accessibility_walking_only",
-                "aspect", "elevation", "slope")
-loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
-
-
 ### Uncomment / adjust p_list to run for MATCHING.
 # ate_method <- "matching"
 # 
+# all_covars <- c("treecover_past", "accessibility", "accessibility_walking_only",
+#                 "aspect", "elevation", "slope")
+# loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
 # p_list <- list(method = c("nearest", "cem", "genetic"),
 #                distance = c("logit", "mahalanobis", "euclidean"),
 #                pop.size = c(50, 100, 500),
@@ -37,6 +35,10 @@ loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
 
 ### Uncomment / adjust p_list to run for SYNTHETIC CONTROLS.
 ate_method <- "synthetic_controls"
+
+all_covars <- c("accessibility", "accessibility_walking_only", "aspect",
+                "elevation", "slope")
+loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
 p_list_g <- list(sc_method = "gsynth",
                  force = c("none", "unit", "time", "two-way"),
                  estimator = c("ife"),
@@ -66,7 +68,7 @@ for (project in projects) {
 }
 
 
-# ----- STEP 4: Run this code to run the method across parameters/projects ----
+# ----- STEP 4: Run this code to run the method or create a job list ----------
 
 p_grid <- create_grid(ate_method, p_list,  # Creates parameter grid
                       time_vars = c("sc_method"))
@@ -74,7 +76,7 @@ p_grid <- create_grid(ate_method, p_list,  # Creates parameter grid
 
 # !*!*!* Just for calibrating job array resource request, remove later. !*!*!*
 p_grid <- p_grid[p_grid$project == "manoa", ]
-p_grid <- p_grid[c(1:3, 5, 6, 9, 11, 13, 16, 17, 27, 36, 65), ]
+p_grid <- p_grid[c(1:5, 8, 9, 12, 16, 17, 11, 26, 38), ]
 # *****
 
 
