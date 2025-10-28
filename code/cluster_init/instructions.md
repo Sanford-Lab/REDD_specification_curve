@@ -72,6 +72,18 @@ Linking to GEOS 3.12.1, GDAL 3.9.1, PROJ 9.4.1; sf_use_s2() is TRUE
 ✓ All packages loaded successfully
 ```
 
+### 8. Ensure RStudio Server links with the correct Python install.
+
+When you first create a new RStudio Server session with the R version set to
+`conda: r-geo`, you may need to change the global Python interpreter option.
+This is only relevant if you are using a package with a Python backend (like
+when `augsynth` uses `keras`). 
+
+To do this, in RStudio go to Tools > Global Options > Python > Select >
+Conda Environments. Select the option that looks like
+`/nfs/roberts/project/pi_ls2375/[your netid]/ycrc_conda/envs/r-geo/bin/python3.10`.
+
+
 ## Environment Contents
 
 ### Core Packages
@@ -79,6 +91,7 @@ Linking to GEOS 3.12.1, GDAL 3.9.1, PROJ 9.4.1; sf_use_s2() is TRUE
 | Package | Version | Purpose |
 |---------|---------|---------|
 | R | 4.2.3 | Base R environment |
+| Python | 3.10 | Base Python environment |
 | r-sf | 1.0.16 | Spatial data handling |
 | MCPanel | ? | Matrix completion for panels |
 | r-keras | 2.15.0 | Deep learning interface |
