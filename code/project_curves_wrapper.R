@@ -116,7 +116,7 @@ update_log <- function(project_name, grid_row, total, time) {
 
 
 ### Main wrapper function for running input method across range of parameters.
-run_sc_method <- function(projects, ate_method, p_grid,
+run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
                           run_type = "interactive") {
   
   # Load logic function for the given method.
@@ -127,7 +127,11 @@ run_sc_method <- function(projects, ate_method, p_grid,
   
   # Iterate through all possible permutations for each project.
   write("", file = "data/progress.log")
-  curr_results <- foreach(i = 1:nrow(p_grid), .combine = rbind) %dopar% {
+  n <- nrow(p_grid)
+  curr_results <- data.frame(project_name = character(n), year = integer(n),
+                             ATT = numeric(n), lower = numeric(n),
+                             upper = numeric(n))
+  for (i in 1:nrow(p_grid)) {
     params <- p_grid[i, names(p_grid) != "project"]
     proj_names <- sapply(projects, function(p) p[1])
     project <- projects[proj_names == p_grid[i, "project"]][[1]]
@@ -137,7 +141,7 @@ run_sc_method <- function(projects, ate_method, p_grid,
     out <- tryCatch({
       ates_by_year <- execute_method(project_name = project[1],
                                      start_year = as.numeric(project[2]), 
-                                     params = params)
+                                     params = params, n_cores = n_cores)
       
       # Retrieve the ATT, lower and upper CI bounds for the year 2022.
       # NOTE: May want to make year an input variable, or a project-specific
@@ -160,7 +164,7 @@ run_sc_method <- function(projects, ate_method, p_grid,
     update_log(project[1], i, nrow(p_grid),  # Record progress
                as.numeric(round(end[3], 2)))  
     
-    return(out)
+    curr_results[i, ] <- out
   }
   
   # Add parameter information back 

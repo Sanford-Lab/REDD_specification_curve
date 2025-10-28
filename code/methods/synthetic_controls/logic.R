@@ -16,7 +16,7 @@ if (interactive()) {
   library(MCPanel)
 }
 
-execute_method <- function(project_name, start_year, params,
+execute_method <- function(project_name, start_year, params, n_cores = 1,
                            outcome_var = "cum_loss") {
   
   # Load the processed dat_long table.
@@ -59,7 +59,7 @@ execute_method <- function(project_name, start_year, params,
     out_gsynth <- gsynth(form, data = synth_dat, index = c("ID", "year"), 
                          force = params$force, estimator = params$estimator,
                          r = params$r, CV = CV, se = TRUE, nboots = 500,
-                         inference = this_inference, parallel = FALSE,
+                         inference = this_inference, parallel = TRUE,
                          seed = 0930)
     
     these_results = out_gsynth$est.att %>%
@@ -86,7 +86,7 @@ execute_method <- function(project_name, start_year, params,
                                  result.var = "Y",  test = "two-sided",
                                  perm = 250, jack = FALSE, check.feas = TRUE,
                                  use.backup = TRUE, use.survey = FALSE,
-                                 n.cores = 1)
+                                 n.cores = n_cores)
     
     these_results <- as.data.frame(do.call(rbind, out_microsynth$Results))
     rownames(these_results) <- NULL
