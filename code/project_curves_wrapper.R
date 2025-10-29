@@ -101,6 +101,8 @@ create_grid <- function(ate_method, p_list, time_vars = NULL) {
   }
 
   p_grid <- as.data.frame(p_grid)
+  row.names(p_grid) <- NULL
+  
   return(p_grid)
   
 }

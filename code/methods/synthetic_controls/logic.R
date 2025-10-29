@@ -60,7 +60,7 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
                          force = params$force, estimator = params$estimator,
                          r = params$r, CV = CV, se = TRUE, nboots = 500,
                          inference = this_inference, parallel = TRUE,
-                         seed = 0930)
+                         seed = 0930, cores = n_cores)
     
     these_results = out_gsynth$est.att %>%
       as.data.frame() %>%
@@ -103,8 +103,7 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
   } else if (params$sc_method == "augsynth") {
     
     out_augsynth <- augsynth(form, unit = ID, time = year, data = synth_dat,
-                             progfunc = params$progfunc, scm = TRUE,
-                             force = params$force)
+                             progfunc = params$progfunc, scm = TRUE)
     sum_augsynth <- summary(out_augsynth,  # This takes a while! 
                             inf = TRUE, inf_type = params$inf_type)
     if (ncol(sum_augsynth$att) > 3) {  # CIs returned depending on progfunc

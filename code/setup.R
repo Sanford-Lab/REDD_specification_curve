@@ -21,7 +21,7 @@ if (!"gsynth" %in% installed.packages()) {
   install.packages("gsynth")
 }
 
-packages <- c("augsynth", "doParallel", "estimatr", "ggplot2", "glmnet",
+packages <- c("augsynth", "doParallel", "estimatr", "ggplot2", "glmnet", "keras3",
               "grf", "gsynth", "Matching", "MatchIt", "MCPanel", "microsynth",
               "randomForest", "rgenoud", "sf", "stringr", "tidyr", "tidyverse", 
               "tidyquant", "zoo", "dplyr")

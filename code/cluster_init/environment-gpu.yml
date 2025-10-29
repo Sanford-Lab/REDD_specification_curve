@@ -26,5 +26,6 @@ dependencies:
   - r-sf>=1.0_14  # Forces recent r42 build with modern proj
 
   # Deep learning (for seq-to-seq augsynth)
+  - r-keras3
   - r-keras
   - tensorflow-gpu

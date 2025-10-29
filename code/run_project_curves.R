@@ -13,9 +13,9 @@ n_cores <- 1                # Number of cores per job / on the local machine
 
 
 # Only worry about these if run_type == "job array".
-gb_per_core <- 5
-time <- "03:00:00"
-rows_per_job <- 13
+gb_per_core <- 4
+time <- "08:30:00"
+rows_per_job <- 15
 
 
 # ----- STEP 2: Set the method and list of parameter settings -----------------
@@ -31,6 +31,7 @@ rows_per_job <- 13
 #                pop.size = c(50, 100, 500),
 #                ratio = c(1, 3, 5),
 #                covariates = loo_covars)
+# time_vars = c("method", "pop.size")  # These variables greatly affect runtime
 
 
 ### Uncomment / adjust p_list to run for SYNTHETIC CONTROLS.
@@ -53,6 +54,8 @@ p_list_a <- list(sc_method = "augsynth",
 p_list <- list("gysnth" = p_list_g, "microsynth" = p_list_m,
                "augsynth" = p_list_a)
 
+time_vars = c("sc_method", "progfunc")  # These variables greatly affect runtime
+
 
 
 # ----- STEP 3: Set list of projects to consider and process ------------------
@@ -71,13 +74,7 @@ for (project in projects) {
 # ----- STEP 4: Run this code to run the method or create a job list ----------
 
 p_grid <- create_grid(ate_method, p_list,  # Creates parameter grid
-                      time_vars = c("sc_method"))
-
-
-# !*!*!* Just for calibrating job array resource request, remove later. !*!*!*
-p_grid <- p_grid[p_grid$project == "manoa", ]
-p_grid <- p_grid[c(1:5, 8, 9, 12, 16, 17, 11, 26, 38), ]
-# *****
+                      time_vars = time_vars)
 
 
 if (run_type == "job array") {
