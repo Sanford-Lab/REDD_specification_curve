@@ -78,6 +78,12 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
   ### Micro synthetic controls logic 
   } else if (params$sc_method == "microsynth") {
     
+    synth_dat <- synth_dat %>%
+      drop_na(all_of(params$covariates[[1]]))
+    if (sum(synth_dat$D == 1) == 0) {
+      stop("No treated pixels remain after removing cases with missing covariates.")
+    }
+    
     out_microsynth <- microsynth(as.data.frame(synth_dat), 
                                  idvar = "ID", timevar = "year", intvar = "D", 
                                  start.pre = 1,  end.pre = (start_year - 1), 
@@ -101,6 +107,13 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
     
   ### Augmented synthetic controls logic 
   } else if (params$sc_method == "augsynth") {
+    
+    # Drop cases with missing covariate values.
+    synth_dat <- synth_dat %>%
+      drop_na(all_of(params$covariates[[1]]))
+    if (sum(synth_dat$D == 1) == 0) {
+      stop("No treated pixels remain after removing cases with missing covariates.")
+    }
     
     out_augsynth <- augsynth(form, unit = ID, time = year, data = synth_dat,
                              progfunc = params$progfunc, scm = TRUE)

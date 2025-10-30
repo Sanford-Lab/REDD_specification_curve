@@ -14,7 +14,7 @@ n_cores <- 1                # Number of cores per job / on the local machine
 
 # Only worry about these if run_type == "job array".
 gb_per_core <- 4
-time <- "08:30:00"
+time <- "10:00:00"
 rows_per_job <- 15
 
 
