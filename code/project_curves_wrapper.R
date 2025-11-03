@@ -119,7 +119,7 @@ update_log <- function(project_name, grid_row, total, time) {
 
 ### Main wrapper function for running input method across range of parameters.
 run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
-                          run_type = "interactive") {
+                          run_type = "interactive", save_res = TRUE) {
   
   # Load logic function for the given method.
   # NOTE: This means `ate_method` must match the name of the method directory,
@@ -172,7 +172,7 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
   # Add parameter information back 
   curr_results <- cbind(curr_results, p_grid[, names(p_grid) != "project"])
   
-  if (run_type == "interactive") {  # Do not save individual job array results.
+  if (run_type == "interactive" & save_res) {  # Don't save job array res yet.
     
     # Record all ATT estimates separately for each project.
     for (project in projects) {
@@ -187,11 +187,23 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
 
 
 ### Make specification curves for each project.
-make_sc_curves <- function(projects, ate_method, leftmargin = 5) {
+make_sc_curves <- function(projects, ate_method, leftmargin = 5,
+                           gc22_comp = FALSE) {
   
   for (project in projects) {
     curr_proj_results <- readRDS(paste0("data/results/", ate_method, "/",
                                         project[1], ".rds"))
+    if (gc22_comp) {
+      gc22 <- readRDS("data/results/gc22.rds")
+      gc22$caliper <- 0.25
+      curr_proj_results <- plyr::rbind.fill(
+        curr_proj_results,
+        gc22 %>% filter(project_name == project[1]))
+      highlight <- nrow(curr_proj_results)
+    } else {
+      highlight <- NULL
+    }
+    
     curr_proj_results <- curr_proj_results %>%
       filter(!is.na(ATT))
     
@@ -200,7 +212,7 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5) {
         width = 1000, height = 1000)
     create_spec_chart(project_name = project[1], results = curr_proj_results, 
                       spec_order = "increasing", color = "royalblue",
-                      leftmargin = leftmargin)
+                      leftmargin = leftmargin, highlight = highlight)
     dev.off()
   }
 
