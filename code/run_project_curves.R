@@ -51,7 +51,7 @@ p_list_a <- list(sc_method = "augsynth",
                  covariates = loo_covars,
                  progfunc = c("None", "EN", "Ridge", "RF", "MCP", "CITS",
                               "seq2seq"))
-p_list <- list("gysnth" = p_list_g, "microsynth" = p_list_m,
+p_list <- list("gsynth" = p_list_g, "microsynth" = p_list_m,
                "augsynth" = p_list_a)
 
 time_vars = c("sc_method", "progfunc")  # These variables greatly affect runtime
@@ -120,14 +120,16 @@ if (run_type == "interactive") {
 
 # (d) Create the dSQ shell file using the job list created above by running the
 #     result printed by this line:
-cat(paste0("\ndsq --job-file ", job_list_file, " --mem-per-cpu ",
-           gb_per_core, "g -t ", time, " --cpus-per-task ", n_cores,
-           " --partition day ",
-           "--batch-file data/results/", ate_method, "/dsq-jobfile-",
-           substr(Sys.time(), 1, 10),
-           ".sh ", "--output cluster_logs/dsq-jobfile-%A_%a-%N.out ",
-           "--status-dir cluster_logs/ ", "\n"))
-dir.create("cluster_logs")
+if (run_type == "job array") {
+  cat(paste0("\ndsq --job-file ", job_list_file, " --mem-per-cpu ",
+             gb_per_core, "g -t ", time, " --cpus-per-task ", n_cores,
+             " --partition day ",
+             "--batch-file data/results/", ate_method, "/dsq-jobfile-",
+             substr(Sys.time(), 1, 10),
+             ".sh ", "--output cluster_logs/dsq-jobfile-%A_%a-%N.out ",
+             "--status-dir cluster_logs/ ", "\n"))
+  dir.create("cluster_logs")
+}
 
 # (e) Then sbatch the sh script created by that command (follow the instructions
 #     that the last command gave you in the terminal.) You can check on the
@@ -137,6 +139,9 @@ dir.create("cluster_logs")
 
 # ----- STEP 6: Run this code to make project specification curves ------------
 
+### If methods were run using job arrays, the results need to be stitched
+### together first. If some jobs failed, follow instructions to repeat step
+### 5. 
 if (run_type == "job array") {
   
   job_list <- readLines(paste0("data/results/", ate_method, "/job_list.txt"))

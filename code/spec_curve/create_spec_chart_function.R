@@ -87,11 +87,13 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   
   index.ci <- match(c("upper","lower"), names(schart_results))
   
+  highlight <- if (!is.null(highlight)) which(these_results$highlight) else NULL
+  
   par(oma=c(1,0,1,1))
   
   schart(schart_results, 
          labels = labels, 
-         highlight = which(these_results$highlight),
+         highlight = highlight,
          #ylim = ylim, 
          axes = FALSE, 
          index.ci=index.ci,

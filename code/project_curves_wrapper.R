@@ -50,7 +50,7 @@ create_grid <- function(ate_method, p_list, time_vars = NULL) {
   if (ate_method == "synthetic_controls") {
     # Different flavors of synthetic controls need different parameters, but
     # want to see them in the same plot.
-    p_grid_g <- expand.grid(grid_helper(p_list$gysnth, projects),
+    p_grid_g <- expand.grid(grid_helper(p_list$gsynth, projects),
                             stringsAsFactors = FALSE)
     p_grid_m <- expand.grid(grid_helper(p_list$microsynth, projects),
                             stringsAsFactors = FALSE)
@@ -61,9 +61,11 @@ create_grid <- function(ate_method, p_list, time_vars = NULL) {
     
     # Remove parameter combinations that are not useful / implemented in
     # underlying packages.
-    jk_only <- c("EN", "RF", "seq2seq")
-    p_grid$inf_type[p_grid$progfunc %in% jk_only] <- "jackknife"
-    p_grid <- p_grid[!duplicated(p_grid), ]
+    if ("progfunc" %in% names(p_grid)) {
+      jk_only <- c("EN", "RF", "seq2seq")
+      p_grid$inf_type[p_grid$progfunc %in% jk_only] <- "jackknife"
+      p_grid <- p_grid[!duplicated(p_grid), ]
+    }
     
   } else if (ate_method == "matching") {
     p_grid <- expand.grid(grid_helper(p_list, projects),
