@@ -11,3 +11,17 @@ and debugging is less flexible.
 
 Therefore I recommend something like: 10 tasks per job, 2 hr 15 minutes per job,
 just one core per job with 2 GB. 
+
+
+
+SYNTHETIC CONTROLS:
+
+Again, each task takes a variable amount of time, with augsynth taking
+significantly longer than gsynth or microsynth depending on what method is used
+for the outcome model correction (seq-to-seq being the longest). 
+
+I recommend (for the current parameter grid): 15 tasks per job, 12 hrs per job,
+one core per job with 4 GB. Some jobs will finish much quicker than 12 hrs - 
+there may be a better way to distribute tasks across jobs to prevent this. For
+now, always include sc_method and progfunc as time_vars when creating the
+parameter grid.

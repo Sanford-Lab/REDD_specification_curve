@@ -1,5 +1,3 @@
-ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R "synthetic_controls" 1 15 1
-ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R "synthetic_controls" 301 315 1
-ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R "synthetic_controls" 676 690 1
-ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R "synthetic_controls" 781 795 1
-ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R "synthetic_controls" 796 810 1
+ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R "synthetic_controls" 211 225 1
+ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R "synthetic_controls" 481 495 1
+ml miniconda; conda activate r-geo; Rscript --vanilla code/job_array_run.R "synthetic_controls" 886 900 1
