@@ -193,7 +193,7 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
   for (project in projects) {
     curr_proj_results <- readRDS(paste0("data/results/", ate_method, "/",
                                         project[1], ".rds"))
-    if (gc22_comp) {
+    if (gc22_comp & ate_method == "matching") {
       gc22 <- readRDS("data/results/gc22.rds")
       gc22$caliper <- 0.25
       curr_proj_results <- plyr::rbind.fill(
