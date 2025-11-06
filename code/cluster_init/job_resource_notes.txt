@@ -25,3 +25,9 @@ one core per job with 4 GB. Some jobs will finish much quicker than 12 hrs -
 there may be a better way to distribute tasks across jobs to prevent this. For
 now, always include sc_method and progfunc as time_vars when creating the
 parameter grid.
+
+So far, have not figured out a way to make augsynth use more than 1 core when
+progfunc = seq-to-seq, although r-keras by default uses all available cores in
+isolation. This makes these runs very very long - maybe an argument against 
+this being a reasonable decision point to include. If we decide to not include
+seq-to-seq, these runs will need far less time.
