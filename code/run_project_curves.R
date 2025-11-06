@@ -150,21 +150,23 @@ if (run_type == "job array") {
   # failed jobs.
   if (!file.exists(paste0("data/results/", ate_method, "/job_list_all.txt"))) {
     write(job_list, paste0("data/results/", ate_method, "/job_list_all.txt"))
+  } else {
+    job_list <- readLines(paste0("data/results/", ate_method, "/job_list_all.txt"))
   }
+  job_list <- job_list[job_list != ""]
   
   job_res_files <- list.files(paste0("data/results/", ate_method,
                                      "/job_array_results/"), full.names = TRUE)
   job_res_files <- grep("\\.rds", job_res_files, value = TRUE)
   
   # Stitch job array results together.
-  if (length(job_res_files) == n_jobs) {
+  if (length(job_res_files) == length(job_list)) {
     all_results <- readRDS(job_res_files[1])
     for (f in job_res_files[2:length(job_res_files)]) {
       all_results <- rbind(all_results,
                            readRDS(f))
     }
   } else {
-    job_list <- job_list[job_list != ""]
     jobs <- sapply(strsplit(job_list, " "), function(s) s[10])
     completes <- gsub(".*\\/([0-9]+)-[0-9]+\\.rds", "\\1", job_res_files)
     job_list <- job_list[which(!jobs %in% completes)]
@@ -182,5 +184,5 @@ if (run_type == "job array") {
 }
 
 # Generate specification curves across projects.
-make_sc_curves(projects, ate_method, leftmargin = 5, gc22_comp = TRUE)
+make_sc_curves(projects, ate_method, leftmargin = 5, gc22_comp = FALSE)
 
