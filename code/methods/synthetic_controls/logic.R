@@ -16,7 +16,7 @@ if (interactive()) {
   library(MCPanel)
 }
 
-execute_method <- function(project_name, start_year, params,
+execute_method <- function(project_name, start_year, params, n_cores = 1,
                            outcome_var = "cum_loss") {
   
   # Load the processed dat_long table.
@@ -59,8 +59,8 @@ execute_method <- function(project_name, start_year, params,
     out_gsynth <- gsynth(form, data = synth_dat, index = c("ID", "year"), 
                          force = params$force, estimator = params$estimator,
                          r = params$r, CV = CV, se = TRUE, nboots = 500,
-                         inference = this_inference, parallel = FALSE,
-                         seed = 0930)
+                         inference = this_inference, parallel = TRUE,
+                         seed = 0930, cores = n_cores)
     
     these_results = out_gsynth$est.att %>%
       as.data.frame() %>%
@@ -78,6 +78,12 @@ execute_method <- function(project_name, start_year, params,
   ### Micro synthetic controls logic 
   } else if (params$sc_method == "microsynth") {
     
+    synth_dat <- synth_dat %>%
+      drop_na(all_of(params$covariates[[1]]))
+    if (sum(synth_dat$D == 1) == 0) {
+      stop("No treated pixels remain after removing cases with missing covariates.")
+    }
+    
     out_microsynth <- microsynth(as.data.frame(synth_dat), 
                                  idvar = "ID", timevar = "year", intvar = "D", 
                                  start.pre = 1,  end.pre = (start_year - 1), 
@@ -86,7 +92,7 @@ execute_method <- function(project_name, start_year, params,
                                  result.var = "Y",  test = "two-sided",
                                  perm = 250, jack = FALSE, check.feas = TRUE,
                                  use.backup = TRUE, use.survey = FALSE,
-                                 n.cores = 1)
+                                 n.cores = n_cores)
     
     these_results <- as.data.frame(do.call(rbind, out_microsynth$Results))
     rownames(these_results) <- NULL
@@ -102,9 +108,15 @@ execute_method <- function(project_name, start_year, params,
   ### Augmented synthetic controls logic 
   } else if (params$sc_method == "augsynth") {
     
+    # Drop cases with missing covariate values.
+    synth_dat <- synth_dat %>%
+      drop_na(all_of(params$covariates[[1]]))
+    if (sum(synth_dat$D == 1) == 0) {
+      stop("No treated pixels remain after removing cases with missing covariates.")
+    }
+    
     out_augsynth <- augsynth(form, unit = ID, time = year, data = synth_dat,
-                             progfunc = params$progfunc, scm = TRUE,
-                             force = params$force)
+                             progfunc = params$progfunc, scm = TRUE)
     sum_augsynth <- summary(out_augsynth,  # This takes a while! 
                             inf = TRUE, inf_type = params$inf_type)
     if (ncol(sum_augsynth$att) > 3) {  # CIs returned depending on progfunc

@@ -1,0 +1,33 @@
+MATCHING:
+
+Each task (param setting x project case) takes a very variable amount of time,
+because genetic matching is much much slower than CEM or NN matching, especially
+for large values of pop.size (~30 minutes vs 5 seconds)
+
+This makes within-job parallelization inefficient for jobs with a smaller number
+of tasks (a couple cores get stuck with finishing long computations while the
+others are idle), but many tasks per job results in longer jobs where monitoring
+and debugging is less flexible. 
+
+Therefore I recommend something like: 10 tasks per job, 2 hr 15 minutes per job,
+just one core per job with 2 GB. 
+
+
+
+SYNTHETIC CONTROLS:
+
+Again, each task takes a variable amount of time, with augsynth taking
+significantly longer than gsynth or microsynth depending on what method is used
+for the outcome model correction (seq-to-seq being the longest). 
+
+I recommend (for the current parameter grid): 15 tasks per job, 12 hrs per job,
+one core per job with 4 GB. Some jobs will finish much quicker than 12 hrs - 
+there may be a better way to distribute tasks across jobs to prevent this. For
+now, always include sc_method and progfunc as time_vars when creating the
+parameter grid.
+
+So far, have not figured out a way to make augsynth use more than 1 core when
+progfunc = seq-to-seq, although r-keras by default uses all available cores in
+isolation. This makes these runs very very long - maybe an argument against 
+this being a reasonable decision point to include. If we decide to not include
+seq-to-seq, these runs will need far less time.
