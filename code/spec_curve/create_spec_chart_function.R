@@ -12,7 +12,7 @@ source("code/spec_curve/schart_ortiz.R")
 
 create_spec_chart <- function(project_name, results, spec_order = "asis",
                               color = "black", leftmargin = 7,
-                              highlight = NULL) {
+                              highlight = NULL, ylabel = "") {
   
   results <- results[, names(results) != "project_name"]
   label_colnames <- colnames(results %>% select(-c(ATT, lower, upper)))
@@ -89,6 +89,10 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   
   highlight <- if (!is.null(highlight)) which(these_results$highlight) else NULL
   
+  if (ylabel != "") {
+    ylabel <- paste0("ATE (", ylabel, ")")
+  } else ylabel <- "ATE"
+  
   par(oma=c(1,0,1,1))
   
   schart(schart_results, 
@@ -97,7 +101,7 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
          #ylim = ylim, 
          axes = FALSE, 
          index.ci=index.ci,
-         ylab="ATE",
+         ylab=ylabel,
          leftmargin = leftmargin,
          order=spec_order,
          col.est=c(color,"magenta3"), 

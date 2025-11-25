@@ -183,5 +183,6 @@ if (run_type == "job array") {
 }
 
 # Generate specification curves across projects.
-make_sc_curves(projects, ate_method, leftmargin = 5, gc22_comp = FALSE)
+make_sc_curves(projects, ate_method, leftmargin = 5, gc22_comp = FALSE,
+               ylabel <- "Cumulative Loss")
 
