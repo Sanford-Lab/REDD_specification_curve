@@ -79,7 +79,7 @@ execute_method <- function(project_name, start_year, params, n_cores = 1) {
     dat_i <- dat_long %>% filter(year == i)
     
     # Calculate the ATE for the current year using the same matching output.
-    ate_i <- lm_robust(treecover_remaining ~ treated, data = dat_i,
+    ate_i <- lm_robust(cum_loss ~ treated, data = dat_i,
                        weights = dat_i$weights)
     
     # Record the coefficient and confidence interval.
