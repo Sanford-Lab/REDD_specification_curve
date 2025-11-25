@@ -3,8 +3,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  # Python (for Keras, for seq-to-seq augsynth)
-  - python=3.10
 
   # R and core packages 4.2 for MCPanel compatibility
   - r-base=4.2
@@ -24,8 +22,3 @@ dependencies:
   - r-units
   - r-s2
   - r-sf>=1.0_14  # Forces recent r42 build with modern proj
-
-  # Deep learning (for seq-to-seq augsynth)
-  - r-keras3
-  - r-keras
-  - tensorflow

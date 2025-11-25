@@ -49,8 +49,7 @@ p_list_m <- list(sc_method = "microsynth",
 p_list_a <- list(sc_method = "augsynth",
                  inf_type = c("conformal", "jackknife"),
                  covariates = loo_covars,
-                 progfunc = c("None", "EN", "Ridge", "RF", "MCP", "CITS",
-                              "seq2seq"))
+                 progfunc = c("None", "EN", "Ridge", "RF", "MCP", "CITS"))
 p_list <- list("gsynth" = p_list_g, "microsynth" = p_list_m,
                "augsynth" = p_list_a)
 
