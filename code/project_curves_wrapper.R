@@ -209,10 +209,28 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
     curr_proj_results <- curr_proj_results %>%
       filter(!is.na(ATT))
     
+    # Plot and save specification curve.
+    # png(paste0("figs/sc/", ate_method, "/", project[1], ".png"),
+    #     width = 1000, height = 1000)
+    # create_spec_chart(project_name = project[1], results = curr_proj_results,
+    #                   spec_order = "increasing", color = "royalblue",
+    #                   leftmargin = leftmargin, highlight = highlight,
+    #                   ylabel = ylabel)
+    # dev.off()
     
+    
+    
+    ### Uncomment to visualize differences in confidence interval size.
     # curr_proj_results$ci_size <- curr_proj_results$upper - curr_proj_results$lower
+    
     # gg <- ggplot(curr_proj_results,
     #              aes(x = sc_method, y = ci_size, color = sc_method)) +
+    # geom_boxplot() +
+    # geom_jitter(alpha = 0.5, width = 0.25, height = 0) +
+    # ggtitle(project[1])
+    
+    # gg <- ggplot(curr_proj_results[curr_proj_results$sc_method == "augsynth", ],
+    #              aes(x = inf_type, y = ci_size, col = inf_type)) +
     #   geom_boxplot() +
     #   geom_jitter(alpha = 0.5, width = 0.25, height = 0) +
     #   ggtitle(project[1])
@@ -220,14 +238,6 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
     # print(gg)
     
     
-    # Plot and save specification curve.
-    png(paste0("figs/sc/", ate_method, "/", project[1], ".png"),
-        width = 1000, height = 1000)
-    create_spec_chart(project_name = project[1], results = curr_proj_results,
-                      spec_order = "increasing", color = "royalblue",
-                      leftmargin = leftmargin, highlight = highlight,
-                      ylabel = ylabel)
-    dev.off()
   }
 
 }
