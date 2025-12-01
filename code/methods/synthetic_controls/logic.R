@@ -31,6 +31,11 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
     rename(Y = outcome_var) %>%
     select(all_of(keep_vars))
   
+  # Convert cumulative loss from sq. meters to hectares
+  if (outcome_var == "cum_loss") {
+    synth_dat$Y <- synth_dat$Y / 10000
+  }
+  
   if (!is.null(params$covariates[[1]])) {
     sep <- if (params$sc_method == "augsynth") "|" else "+"
     form <- as.formula(paste("Y ~ D", sep, paste(params$covariates[[1]],
@@ -88,11 +93,11 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
                                  idvar = "ID", timevar = "year", intvar = "D", 
                                  start.pre = 1,  end.pre = (start_year - 1), 
                                  end.post = start_year:22,  match.out = "Y",
-                                 match.covar.min = params$covariates[[1]], 
+                                 match.covar.min = params$covariates[[1]],
+                                 omnibus.var = NULL,
                                  result.var = "Y",  test = "two-sided",
                                  perm = 250, jack = FALSE, check.feas = TRUE,
-                                 use.backup = TRUE, use.survey = FALSE,
-                                 n.cores = n_cores)
+                                 use.backup = TRUE, n.cores = n_cores)
     
     these_results <- as.data.frame(do.call(rbind, out_microsynth$Results))
     rownames(these_results) <- NULL
@@ -100,9 +105,8 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
     these_results <- these_results %>%
       mutate(year = start_year:22,
              coef = Trt - Con,
-             se = abs(coef/qnorm(Perm.pVal)),
-             lower = coef - 1.96*se,
-             upper = coef + 1.96*se) %>%
+             lower = Linear.Lower * Con,
+             upper = Linear.Upper * Con) %>%
       select(year, coef, lower, upper)
     
   ### Augmented synthetic controls logic 
