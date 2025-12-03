@@ -10,7 +10,7 @@ if (!"augsynth" %in% installed.packages()) {
 # Install MCPanel, which isn't on CRAN:
 # (NOTE: On the cluster, follow code/cluster_init/instructions.md to install
 #  MCPanel before this point. This should work on local machines, though.)
-if (!"augsynth" %in% installed.packages()) {
+if (!"MCPanel" %in% installed.packages()) {
   devtools::install_github("susanathey/MCPanel", force=TRUE)
 }
 

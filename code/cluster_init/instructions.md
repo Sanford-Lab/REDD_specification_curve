@@ -9,11 +9,12 @@ A reproducible conda environment for R with support for:
 - **Conda/Mamba** - Package manager (Mamba recommended for faster installs)
 - **Linux x86_64** - Tested on RHEL 8.10
 
-## Installation from cluster terminal
+## Installation (1-7 from cluster terminal)
 
-### 1. Move to the Github Repository
+### 1. Request an interactive node and move to the Github Repository
 
 ```bash
+salloc
 cd REDD_specification_curve
 ```
 
@@ -62,6 +63,10 @@ Linking to GEOS 3.12.1, GDAL 3.9.1, PROJ 9.4.1; sf_use_s2() is TRUE
 ✓ All packages loaded successfully
 ```
 
+### 8. Start a RStudio Server interactive session on Bouchet.
+
+Set `R Version` to `conda: r-geo` when starting the session. In the session, run `code/setup.R` interactively to install remaining packages. If asked if you want to update package dependencies, say NO - do not update any at any point! 
+
 
 ## Environment Contents
 
@@ -70,7 +75,6 @@ Linking to GEOS 3.12.1, GDAL 3.9.1, PROJ 9.4.1; sf_use_s2() is TRUE
 | Package | Version | Purpose |
 |---------|---------|---------|
 | R | 4.2.3 | Base R environment |
-| Python | 3.10 | Base Python environment |
 | r-sf | 1.0.16 | Spatial data handling |
 | MCPanel | ? | Matrix completion for panels |
 

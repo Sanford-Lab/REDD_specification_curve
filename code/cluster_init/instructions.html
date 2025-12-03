@@ -365,11 +365,13 @@ for faster installs)</li>
 <li><strong>Linux x86_64</strong> - Tested on RHEL 8.10</li>
 </ul>
 </div>
-<div id="installation-from-cluster-terminal" class="section level2">
-<h2>Installation from cluster terminal</h2>
-<div id="move-to-the-github-repository" class="section level3">
-<h3>1. Move to the Github Repository</h3>
-<pre class="bash"><code>cd REDD_specification_curve</code></pre>
+<div id="installation-1-7-from-cluster-terminal" class="section level2">
+<h2>Installation (1-7 from cluster terminal)</h2>
+<div id="request-an-interactive-node-and-move-to-the-github-repository" class="section level3">
+<h3>1. Request an interactive node and move to the Github
+Repository</h3>
+<pre class="bash"><code>salloc
+cd REDD_specification_curve</code></pre>
 </div>
 <div id="choose-your-environment-5-10-minutes" class="section level3">
 <h3>2. Choose Your Environment (5-10 minutes)</h3>
@@ -402,6 +404,13 @@ environment ICU library, required for MCPanel.</p>
 <pre><code>Linking to GEOS 3.12.1, GDAL 3.9.1, PROJ 9.4.1; sf_use_s2() is TRUE
 ✓ All packages loaded successfully</code></pre>
 </div>
+<div id="start-a-rstudio-server-interactive-session-on-bouchet." class="section level3">
+<h3>8. Start a RStudio Server interactive session on Bouchet.</h3>
+<p>Set <code>R Version</code> to <code>conda: r-geo</code> when starting
+the session. In the session, run <code>code/setup.R</code> interactively
+to install remaining packages. If asked if you want to update package
+dependencies, say NO - do not update any at any point!</p>
+</div>
 </div>
 <div id="environment-contents" class="section level2">
 <h2>Environment Contents</h2>
@@ -422,16 +431,11 @@ environment ICU library, required for MCPanel.</p>
 <td>Base R environment</td>
 </tr>
 <tr class="even">
-<td>Python</td>
-<td>3.10</td>
-<td>Base Python environment</td>
-</tr>
-<tr class="odd">
 <td>r-sf</td>
 <td>1.0.16</td>
 <td>Spatial data handling</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>MCPanel</td>
 <td>?</td>
 <td>Matrix completion for panels</td>
