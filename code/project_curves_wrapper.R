@@ -45,7 +45,7 @@ grid_helper <- function(ind_p_list, projects) {
 
 ### Create grid of parameter permutations x projects, to allow parallelization
 ### over both parameters and projects, as a data frame.
-create_grid <- function(ate_method, p_list, time_vars = NULL) {
+create_grid <- function(ate_method, p_list, projects, time_vars = NULL) {
   
   if (ate_method == "synthetic_controls") {
     # Different flavors of synthetic controls need different parameters, but
@@ -190,7 +190,8 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
 
 ### Make specification curves for each project.
 make_sc_curves <- function(projects, ate_method, leftmargin = 5,
-                           gc22_comp = FALSE, ylabel = "") {
+                           gc22_comp = FALSE, west23_comp = FALSE,
+                           ylabel = "") {
   
   for (project in projects) {
     curr_proj_results <- readRDS(paste0("data/results/", ate_method, "/",
@@ -202,6 +203,12 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
         curr_proj_results,
         gc22 %>% filter(project_name == project[1]))
       highlight <- nrow(curr_proj_results)
+    } else if (west23_comp & ate_method == "synthetic_controls") {
+      west23 <- readRDS("data/results/west23.rds")
+      curr_proj_results <- plyr::rbind.fill(
+        curr_proj_results,
+        west23 %>% filter(project_name == project[1]))
+      highlight <- nrow(curr_proj_results)
     } else {
       highlight <- NULL
     }
@@ -210,14 +217,13 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
       filter(!is.na(ATT))
     
     # Plot and save specification curve.
-    # png(paste0("figs/sc/", ate_method, "/", project[1], ".png"),
-    #     width = 1000, height = 1000)
-    # create_spec_chart(project_name = project[1], results = curr_proj_results,
-    #                   spec_order = "increasing", color = "royalblue",
-    #                   leftmargin = leftmargin, highlight = highlight,
-    #                   ylabel = ylabel)
-    # dev.off()
-    
+    png(paste0("figs/sc/", ate_method, "/", project[1], ".png"),
+        width = 1000, height = 1000)
+    create_spec_chart(project_name = project[1], results = curr_proj_results,
+                      spec_order = "increasing", color = "royalblue",
+                      leftmargin = leftmargin, highlight = highlight,
+                      ylabel = ylabel)
+    dev.off()
     
     
     ### Uncomment to visualize differences in confidence interval size.

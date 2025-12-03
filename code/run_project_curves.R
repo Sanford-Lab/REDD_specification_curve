@@ -73,7 +73,7 @@ for (project in projects) {
 # ----- STEP 4: Run this code to run the method or create a job list ----------
 
 p_grid <- create_grid(ate_method, p_list,  # Creates parameter grid
-                      time_vars = time_vars)
+                      projects, time_vars = time_vars)
 
 
 if (run_type == "job array") {
@@ -184,5 +184,5 @@ if (run_type == "job array") {
 
 # Generate specification curves across projects.
 make_sc_curves(projects, ate_method, leftmargin = 5, gc22_comp = FALSE,
-               ylabel <- "Cumulative Loss")
+               west23_comp = TRUE, ylabel = "Cumulative Loss")
 
