@@ -16,6 +16,8 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   
   results <- results[, names(results) != "project_name"]
   label_colnames <- colnames(results %>% select(-c(ATT, lower, upper)))
+  ylim <- c(min(0, max(min(2*results$ATT), min(results$lower))),
+            max(0, min(max(2*results$ATT), max(results$upper))))
   
   # Handle boolean columns
   bool_cols <- which(sapply(1:ncol(results), function(i) class(results[1, i])) == "logical")
@@ -101,6 +103,7 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
          #ylim = ylim, 
          axes = FALSE, 
          index.ci=index.ci,
+         ylim = ylim,
          ylab=ylabel,
          leftmargin = leftmargin,
          order=spec_order,
