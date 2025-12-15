@@ -134,7 +134,7 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
   n <- nrow(p_grid)
   curr_results <- data.frame(project_name = character(n), year = integer(n),
                              ATT = numeric(n), lower = numeric(n),
-                             upper = numeric(n))
+                             upper = numeric(n), pval = numeric(n))
   for (i in 1:nrow(p_grid)) {
     params <- p_grid[i, names(p_grid) != "project"]
     proj_names <- sapply(projects, function(p) p[1])
@@ -153,7 +153,7 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
       result_2022 <- ates_by_year %>% filter(year == 22)
       data.frame(project_name = project[1], year = project[2],
                  ATT = result_2022$coef, lower = result_2022$lower,
-                 upper = result_2022$upper)
+                 upper = result_2022$upper, pval = result_2022$pval)
       
     }, error = function(e) {
       write(paste0(Sys.time(), ": Error with grid row ", i, "/", nrow(p_grid),
@@ -161,7 +161,7 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
                    conditionMessage(e)),
             "data/progress.log", append = TRUE)
       data.frame(project_name = project[1], year = project[2],
-                 ATT = NA, lower = NA, upper = NA)
+                 ATT = NA, lower = NA, upper = NA, pval = NA)
     })
     
     end <- proc.time() - start
