@@ -1,0 +1,41 @@
+﻿project_id,project_name,country,start_year,area_ha,pa_oerc_overlap,mean_df,mean_df_controls,mean_degrade,mean_degrade_controls,country_df,threat_grp,forest_cover_perc_start
+1326, Laguna Seca Forest Carbon Project,Belize (BLZ),2011,8723,0.2,0,0.32,0.32,0.93,0.8, High,94.9
+1094, Ecomapua Amazon REDD Project,Brazil (BRA),2002,99149,99.8,0.01,0.05,0.11,0.22,0.7, High,97.8
+981, ADPML PortelPara REDD Project,Brazil (BRA),2008,150204,0,0.09,0.18,0.29,0.37,0.4, Low,94.6
+977, RMDLT PortelPara REDD Project,Brazil (BRA),2008,211131,0,0.02,0.07,0.07,0.16,0.4, Low,98
+1118,Suruí Forest Carbon Project,Brazil (BRA),2009,33626,100,1.32,0.87,2.21,1.53,0.4, Low,89.3
+875, Florestal Santa Maria Project,Brazil (BRA),2009,72120,0,0.02,0.26,0.09,0.39,0.4, Low,98
+1113, The Valparaiso Project,Brazil (BRA),2011,29195,0,0.14,0.35,0.21,0.65,0.4, Low,94.2
+963, The Purus Project,Brazil (BRA),2011,35746,7.1,0.33,0.35,0.64,0.58,0.4, Low,96.8
+1112, The Russas Project,Brazil (BRA),2011,42788,0,0.04,0.16,0.13,0.41,0.4, Low,97.8
+1115,Jari/Amapá REDD+ Project,Brazil (BRA),2011,78232,1.4,0.19,0.75,0.79,1.6,0.4, Low,85.1
+1329,Maísa REDD+ Project,Brazil (BRA),2012,30242,0,0.02,0.79,0.39,2.61,0.4, Low,97.1
+1382, The Envira Amazonia Project - A Tropical Forest Conservation Project in Acre,Brazil (BRA),2012,39749,0,0.04,0.12,0.07,0.21,0.4, Low,99.2
+1503,Resex Rio PretoJacundá REDD+ Project,Brazil (BRA),2012,101592,99.1,0.75,0.81,1.15,1.47,0.4, Low,98
+PL1654, Fortaleza Ituxi REDD Project,Brazil (BRA),2013,47327,0,0.02,0.28,0.12,0.69,0.4, Low,97.3
+1571, Manoa REDD+ Project ,Brazil (BRA),2013,73620,0.1,0.02,0.92,0.24,1.87,0.4, Low,98.5
+1686, Agrocortex REDD Project,Brazil (BRA),2014,187740,0,0.05,0.18,0.6,0.38,0.4, Low,98.9
+PL1748, Southern Cardamoms REDD+ Project,Cambodia (KHM),2010,500452,29.6,0.2,0.96,0.44,1.38,2.7, High,84.3
+856,The ChocóDarién Conservation Corridor REDD Project,Colombia (COL),2010,10687,95.7,0.1,0.19,0.37,0.42,0.4, Low,95.4
+1399,Mutatá REDD+ Project,Colombia (COL),2013,40471,0.7,0.03,0.12,0.17,0.48,0.4, Low,99.1
+1391, SUPP REDD+ Project,Colombia (COL),2013,54210,49.7,0.01,0.02,0.18,0.14,0.4, Low,98.5
+1389, Acapa - Bajo Mira Y Frontera REDD+ Project,Colombia (COL),2013,55448,11.5,0.06,0.49,0.38,1.52,0.4, Low,91.8
+1400, Concosta REDD+ Project,Colombia (COL),2013,64997,49.7,0.01,0.02,0.11,0.14,0.4, Low,98.2
+1392, Cajambre REDD+ Project,Colombia (COL),2013,65845,1.4,0.01,0.03,0.04,0.17,0.4, Low,98.5
+1395,Bajo Calima y Bahía Málaga (BCBM) REDD+ Project,Colombia (COL),2013,91971,27.3,0.01,0.19,0.06,0.67,0.4, Low,97.7
+1566, REDD+ Project Resguardo Indigena Unificado Selva de Mataven,Colombia (COL),2013,1557190,0,0.13,0.12,0.33,0.34,0.4, Low,83.5
+1396, Rio Pepe y ACABA REDD+ Project,Colombia (COL),2014,61132,0,0,0.09,0.13,0.59,0.3, Low,98.3
+1390,Carmen del Darién REDD+ Project,Colombia (COL),2014,134243,0,0.16,0.07,0.7,0.54,0.3, Low,91.6
+1052, North Pikounda REDD+,Congo (COG),2012,92735,2.8,0,0,0,0.03,0.3, Low,100
+1359, Isangi REDD+ Project,Congo DRC (COD),2009,199421,0,0.07,0.14,0.41,0.52,0.7, High,98.1
+1215, The Makira Forest Protected Area in Madagascar,Madagascar (MDG),2005,374708,0,0.04,0.29,0.19,0.86,1.8, High,90
+1047, Carbon Emissions Reduction Project in the Forest Corridor Ambositra Vondrozo (COFAV),Madagascar (MDG),2007,144336,0.6,0.68,2.19,1.03,2.97,1.7, High,90.8
+1311,Carbon Emissions Reduction Project in the Corridor Ankeniheny Zahamena (CAZ) Protected Area,Madagascar (MDG),2008,392643,0.8,0.55,1.25,1.19,2.34,1.8, High,94.5
+1122, April Salumei REDD Project,Papua New Guinea (PNG),2009,653933,35,0.02,0.03,0.07,0.14,0.2, Low,96.6
+844, Madre de Dios Amazon REDD Project,Peru (PER),2006,98539,0,0.07,0.19,0.46,0.53,0.2, Low,93.1
+985, Cordillera Azul National Park REDD project,Peru (PER),2006,1362722,100,0.01,0.02,0.05,0.13,0.2, Low,97.5
+944, Alto Mayo Conservation Initiative,Peru (PER),2007,178704,98,0.09,0.08,0.33,0.52,0.2, Low,89.5
+1067, Reduction of deforestation and degradation in Tambopata National Reserve and BahuajaSonene National Park within the area of Madre de Dios region,Peru (PER),2008,565849,99.6,0.02,0.13,0.04,0.37,0.2, Low,95.7
+1360, Forest Management to reduce deforestation and degradation in Shipibo Conibo and Cacataibo Indigenous communities of Ucayali region,Peru (PER),2010,129260,0,0.29,0.18,0.76,0.49,0.2, Low,97.6
+958,Biocorredor Martín Sagrado REDD+ project,Peru (PER),2010,300275,0,0.03,0.02,0.15,0.12,0.2, Low,95
+PL1218,"Evio Kuiñaji Ese ́Eja Cuana, To Mitigate Climate Change, Madre de Dios",Peru (PER),2011,8724,18.4,0.14,1.28,0.38,2.3,0.2, Low,93.7
