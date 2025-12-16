@@ -12,12 +12,14 @@ source("code/spec_curve/schart_ortiz.R")
 
 create_spec_chart <- function(project_name, results, spec_order = "asis",
                               color = "black", leftmargin = 7,
-                              highlight = NULL, ylabel = "") {
+                              highlight = NULL, ylabel = "",
+                              show_cis = show_cis) {
   
   results <- results[, names(results) != "project_name"]
-  label_colnames <- colnames(results %>% select(-c(ATT, lower, upper)))
+  label_colnames <- colnames(results %>% select(-c(ATT, lower, upper, pval, year)))
   ylim <- c(min(0, max(min(2*results$ATT), min(results$lower))),
             max(0, min(max(2*results$ATT), max(results$upper))))
+  ylim[2] <- ylim[2] + 0.05*(ylim[2] - ylim[1])  ## Leave room for the title
   
   # Handle boolean columns
   bool_cols <- which(sapply(1:ncol(results), function(i) class(results[1, i])) == "logical")
@@ -85,9 +87,16 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   }
   
   schart_results <- these_results %>% as.data.frame() %>%
-    select(ATT, everything(), -ID, -highlight)
+    select(ATT, everything(), -ID, -highlight, -pval, -year)
   
-  index.ci <- match(c("upper","lower"), names(schart_results))
+  if (show_cis) {
+    index.ci <- match(c("upper","lower"), names(schart_results))
+  } else {
+    index.ci <- NULL
+    schart_results <- schart_results %>%
+      select(-lower, -upper)
+  }
+  
   
   highlight <- if (!is.null(highlight)) which(these_results$highlight) else NULL
   
@@ -100,9 +109,9 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   schart(schart_results, 
          labels = labels, 
          highlight = highlight,
-         #ylim = ylim, 
          axes = FALSE, 
          index.ci=index.ci,
+         index.se = NULL,
          ylim = ylim,
          ylab=ylabel,
          leftmargin = leftmargin,
@@ -113,7 +122,8 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
          pch.dot=c(22,22,22,22)
   )
   # print(project_name) # in format of (project_name, start_year)
-  text(x=mean(1:nrow(schart_results)), y=max(schart_results$upper), project_name[1], col="black", font=2)
+  text(x=mean(1:nrow(schart_results)), y=ylim[2],
+       project_name[1], col="black", font=2)
   
 }
 

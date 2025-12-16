@@ -191,7 +191,7 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
 ### Make specification curves for each project.
 make_sc_curves <- function(projects, ate_method, leftmargin = 5,
                            gc22_comp = FALSE, west23_comp = FALSE,
-                           ylabel = "") {
+                           ylabel = "", show_cis = TRUE) {
   
   for (project in projects) {
     curr_proj_results <- readRDS(paste0("data/results/", ate_method, "/",
@@ -222,7 +222,7 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
     create_spec_chart(project_name = project[1], results = curr_proj_results,
                       spec_order = "increasing", color = "royalblue",
                       leftmargin = leftmargin, highlight = highlight,
-                      ylabel = ylabel)
+                      ylabel = ylabel, show_cis = show_cis)
     dev.off()
     
     

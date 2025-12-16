@@ -6,7 +6,7 @@ schart <- function(data, labels=NA, highlight=NA, n=1, index.est=1, index.se=2, 
                    col.est=c("grey60", "red3"), col.est2=c("grey80","lightcoral"), bg.est=c("white", "white"),
                    col.dot=c("grey60","grey95","grey95","red3"),
                    bg.dot=c("grey60","grey95","grey95","white"),
-                   pch.dot=c(22,22,22,22), fonts=c(2,1), adj=c(1,1),cex=c(1,1)) {
+                   pch.dot=c(22,22,22,22), fonts=c(2,1), adj=c(1,1), cex=c(1,1)) {
   
   # Authors: Ariel Ortiz-Bobea (ao332@cornell.edu).
   # Version: March 22, 2021
@@ -78,18 +78,22 @@ schart <- function(data, labels=NA, highlight=NA, n=1, index.est=1, index.se=2, 
         l2 <- d[,index.ci[3]]
         h2 <- d[,index.ci[4]]
       }
-    } else {
-      if (!is.numeric(d[,index.se]))  {warning("index.se does not point to a numeric vector.") ; break}
-      se  <- d[,index.se] # Std error
-      ci <- sort(ci)
-      a <- qnorm(1-(1-ci)/2)
-      l1 <- est - a[1]*se
-      h1 <- est + a[1]*se
-      if (length(ci)>1) {
-        l2 <- est - a[2]*se
-        h2 <- est + a[2]*se
-      }
     }
+    ### MA: Editing this to just not show confidence intervals in this case.
+    #  else {  
+      
+      # if (!is.numeric(d[,index.se]))  {warning("index.se does not point to a numeric vector.") ; break}
+      # se  <- d[,index.se] # Std error
+      # ci <- sort(ci)
+      # a <- qnorm(1-(1-ci)/2)
+      # l1 <- est - a[1]*se
+      # h1 <- est + a[1]*se
+      # if (length(ci)>1) {
+      #   l2 <- est - a[2]*se
+      #   h2 <- est + a[2]*se
+      # }
+      
+    # }
     
     # Table
     if (length(index.ci)>1) remove.index <- c(index.est,index.ci) else remove.index <- c(index.est,index.se)
@@ -222,15 +226,23 @@ schart <- function(data, labels=NA, highlight=NA, n=1, index.est=1, index.se=2, 
     } else {
       abline(v=ref, lty=lty.ref, lwd=lwd.ref, col=col.ref)
     }
-    # Vertical bars
-    if (horizontal) {
-      if (length(ci)>1 | length(index.ci)>2) arrows(x0=xs, y0=l2, x1=xs, y1=h2, length=length, code=3, lwd=rev(lwd.est)[1], col=colvec2, angle=90)
-      arrows(x0=xs, y0=l1, x1=xs, y1=h1, length=length, code=3, lwd=lwd.est[1]     , col=colvec, angle=90)
-      points(xs, est, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
-    } else {
-      if (length(ci)>1 | length(index.ci)>2) arrows(y0=xs, x0=l2, y1=xs, x1=h2, length=length, code=3, lwd=rev(lwd.est)[1], col=colvec2, angle=90)
-      arrows(y0=xs, x0=l1, y1=xs, x1=h1, length=length, code=3, lwd=lwd.est[1]     , col=colvec, angle=90)
-      points(est,xs, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+    # Vertical bars and points
+    if (!is.null(index.ci)) {
+      if (horizontal) {
+        if (length(ci)>1 | length(index.ci)>2) arrows(x0=xs, y0=l2, x1=xs, y1=h2, length=length, code=3, lwd=rev(lwd.est)[1], col=colvec2, angle=90)
+        arrows(x0=xs, y0=l1, x1=xs, y1=h1, length=length, code=3, lwd=lwd.est[1]     , col=colvec, angle=90)
+        points(xs, est, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+      } else {
+        if (length(ci)>1 | length(index.ci)>2) arrows(y0=xs, x0=l2, y1=xs, x1=h2, length=length, code=3, lwd=rev(lwd.est)[1], col=colvec2, angle=90)
+        arrows(y0=xs, x0=l1, y1=xs, x1=h1, length=length, code=3, lwd=lwd.est[1]     , col=colvec, angle=90)
+        points(est,xs, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+      }
+    } else {  # Just points
+      if (horizontal) {
+        points(xs, est, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+      } else {
+        points(est,xs, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+      }
     }
     # Axes
     if (axes) {
