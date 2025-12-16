@@ -191,26 +191,30 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
 ### Make specification curves for each project.
 make_sc_curves <- function(projects, ate_method, leftmargin = 5,
                            gc22_comp = FALSE, west23_comp = FALSE,
-                           ylabel = "", show_cis = TRUE) {
+                           ylabel = "", show_cis = TRUE, show_pvals = FALSE) {
   
   for (project in projects) {
     curr_proj_results <- readRDS(paste0("data/results/", ate_method, "/",
                                         project[1], ".rds"))
-    if (gc22_comp & ate_method == "matching") {
-      gc22 <- readRDS("data/results/gc22.rds")
-      gc22$caliper <- 0.25
-      curr_proj_results <- plyr::rbind.fill(
-        curr_proj_results,
-        gc22 %>% filter(project_name == project[1]))
-      highlight <- nrow(curr_proj_results)
-    } else if (west23_comp & ate_method == "synthetic_controls") {
-      west23 <- readRDS("data/results/west23.rds")
-      curr_proj_results <- plyr::rbind.fill(
-        curr_proj_results,
-        west23 %>% filter(project_name == project[1]))
-      highlight <- nrow(curr_proj_results)
-    } else {
-      highlight <- NULL
+    # if (gc22_comp & ate_method == "matching") {
+    #   gc22 <- readRDS("data/results/gc22.rds")
+    #   gc22$caliper <- 0.25
+    #   curr_proj_results <- plyr::rbind.fill(
+    #     curr_proj_results,
+    #     gc22 %>% filter(project_name == project[1]))
+    #   highlight <- nrow(curr_proj_results)
+    # } else if (west23_comp & ate_method == "synthetic_controls") {
+    #   west23 <- readRDS("data/results/west23.rds")
+    #   curr_proj_results <- plyr::rbind.fill(
+    #     curr_proj_results,
+    #     west23 %>% filter(project_name == project[1]))
+    #   highlight <- nrow(curr_proj_results)
+    # } else {
+    #   highlight <- NULL
+    # }
+    
+    if (show_pvals) {
+      highlight <- which(curr_proj_results$pval < 0.05)
     }
     
     curr_proj_results <- curr_proj_results %>%
@@ -220,7 +224,7 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
     png(paste0("figs/sc/", ate_method, "/", project[1], ".png"),
         width = 1000, height = 1000)
     create_spec_chart(project_name = project[1], results = curr_proj_results,
-                      spec_order = "increasing", color = "royalblue",
+                      spec_order = "increasing", color = "dodgerblue",
                       leftmargin = leftmargin, highlight = highlight,
                       ylabel = ylabel, show_cis = show_cis)
     dev.off()

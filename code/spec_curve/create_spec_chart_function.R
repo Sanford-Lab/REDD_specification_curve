@@ -116,10 +116,11 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
          ylab=ylabel,
          leftmargin = leftmargin,
          order=spec_order,
-         col.est=c(color,"magenta3"), 
-         col.dot=c(color,"grey95","grey95","magenta3"),
-         bg.dot=c(color,"grey95","grey95","magenta3"),
-         pch.dot=c(22,22,22,22)
+         col.est=c("gray60",color), 
+         col.dot=c("gray60","grey95","grey95",color),
+         bg.dot=c("gray60","grey95","grey95",color),
+         pch.dot=c(22,22,22,22),
+         pch.est = if (show_cis) 21 else 20
   )
   # print(project_name) # in format of (project_name, start_year)
   text(x=mean(1:nrow(schart_results)), y=ylim[2],
