@@ -196,25 +196,25 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
   for (project in projects) {
     curr_proj_results <- readRDS(paste0("data/results/", ate_method, "/",
                                         project[1], ".rds"))
-    # if (gc22_comp & ate_method == "matching") {
-    #   gc22 <- readRDS("data/results/gc22.rds")
-    #   gc22$caliper <- 0.25
-    #   curr_proj_results <- plyr::rbind.fill(
-    #     curr_proj_results,
-    #     gc22 %>% filter(project_name == project[1]))
-    #   highlight <- nrow(curr_proj_results)
-    # } else if (west23_comp & ate_method == "synthetic_controls") {
-    #   west23 <- readRDS("data/results/west23.rds")
-    #   curr_proj_results <- plyr::rbind.fill(
-    #     curr_proj_results,
-    #     west23 %>% filter(project_name == project[1]))
-    #   highlight <- nrow(curr_proj_results)
-    # } else {
-    #   highlight <- NULL
-    # }
+    if (gc22_comp & ate_method == "matching") {
+      gc22 <- readRDS("data/results/gc22.rds")
+      gc22$caliper <- 0.25
+      curr_proj_results <- plyr::rbind.fill(
+        curr_proj_results,
+        gc22 %>% filter(project_name == project[1]))
+      highlight <- nrow(curr_proj_results)
+    } else if (west23_comp & ate_method == "synthetic_controls") {
+      west23 <- readRDS("data/results/west23.rds")
+      curr_proj_results <- plyr::rbind.fill(
+        curr_proj_results,
+        west23 %>% filter(project_name == project[1]))
+      highlight <- nrow(curr_proj_results)
+    } else {
+      highlight <- NULL
+    }
     
     if (show_pvals) {
-      highlight <- which(curr_proj_results$pval < 0.05)
+      highlight_shape <- which(curr_proj_results$pval < 0.05)
     }
     
     curr_proj_results <- curr_proj_results %>%
@@ -226,6 +226,7 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
     create_spec_chart(project_name = project[1], results = curr_proj_results,
                       spec_order = "increasing", color = "dodgerblue",
                       leftmargin = leftmargin, highlight = highlight,
+                      highlight_shape = highlight_shape,
                       ylabel = ylabel, show_cis = show_cis)
     dev.off()
     

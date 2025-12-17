@@ -12,8 +12,8 @@ source("code/spec_curve/schart_ortiz.R")
 
 create_spec_chart <- function(project_name, results, spec_order = "asis",
                               color = "black", leftmargin = 7,
-                              highlight = NULL, ylabel = "",
-                              show_cis = show_cis) {
+                              highlight = NULL, highlight_shape = NULL,
+                              ylabel = "", show_cis = show_cis) {
   
   results <- results[, names(results) != "project_name"]
   label_colnames <- colnames(results %>% select(-c(ATT, lower, upper, pval, year)))
@@ -56,6 +56,10 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
     results$highlight <- FALSE
     results$highlight[highlight] <- TRUE
   }
+  if (!is.null(highlight_shape)) {
+    results$highlight_shape <- FALSE
+    results$highlight_shape[highlight_shape] <- TRUE
+  }
   
   results <- results %>%  # Sort labels
     arrange(across(all_of(label_colnames)))
@@ -87,7 +91,7 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   }
   
   schart_results <- these_results %>% as.data.frame() %>%
-    select(ATT, everything(), -ID, -highlight, -pval, -year)
+    select(ATT, everything(), -ID, -highlight, -highlight_shape, -pval, -year)
   
   if (show_cis) {
     index.ci <- match(c("upper","lower"), names(schart_results))
@@ -99,6 +103,7 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   
   
   highlight <- if (!is.null(highlight)) which(these_results$highlight) else NULL
+  highlight_shape <- if (!is.null(highlight_shape)) which(these_results$highlight_shape) else NULL
   
   if (ylabel != "") {
     ylabel <- paste0("ATE (", ylabel, ")")
@@ -109,6 +114,7 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   schart(schart_results, 
          labels = labels, 
          highlight = highlight,
+         highlight_shape = highlight_shape,
          axes = FALSE, 
          index.ci=index.ci,
          index.se = NULL,
@@ -116,11 +122,11 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
          ylab=ylabel,
          leftmargin = leftmargin,
          order=spec_order,
-         col.est=c("gray60",color), 
-         col.dot=c("gray60","grey95","grey95",color),
-         bg.dot=c("gray60","grey95","grey95",color),
+         col.est=c(color, "magenta3"), 
+         col.dot=c(color,"grey95","grey95","magenta3"),
+         bg.dot=c(color,"grey95","grey95","magenta3"),
          pch.dot=c(22,22,22,22),
-         pch.est = if (show_cis) 21 else 20
+         pch.est = if (show_cis) c(21,21,21,21) else c(21,21,21,20)
   )
   # print(project_name) # in format of (project_name, start_year)
   text(x=mean(1:nrow(schart_results)), y=ylim[2],

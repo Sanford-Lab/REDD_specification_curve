@@ -1,8 +1,8 @@
 # specification chart code from Ortiz-Bobea at Cornell.
 
-schart <- function(data, labels=NA, highlight=NA, n=1, index.est=1, index.se=2, index.ci=NA,
+schart <- function(data, labels=NA, highlight=NA, highlight_shape = NA, n=1, index.est=1, index.se=2, index.ci=NA,
                    order="asis", ci=.95, ylim=NA, axes=T, heights=c(1,1), leftmargin=11, offset=c(0,0), ylab="Coefficient", lwd.border=1, horizontal=T,
-                   lwd.est=4, pch.est=21, lwd.symbol=2, ref=0, lwd.ref=1, lty.ref=2, col.ref="black", band.ref=NA, col.band.ref=NA,length=0,
+                   lwd.est=4, pch.est=c(21,21,21,21), lwd.symbol=2, ref=0, lwd.ref=1, lty.ref=2, col.ref="black", band.ref=NA, col.band.ref=NA,length=0,
                    col.est=c("grey60", "red3"), col.est2=c("grey80","lightcoral"), bg.est=c("white", "white"),
                    col.dot=c("grey60","grey95","grey95","red3"),
                    bg.dot=c("grey60","grey95","grey95","white"),
@@ -206,6 +206,7 @@ schart <- function(data, labels=NA, highlight=NA, n=1, index.est=1, index.se=2, 
     
     # Top panel (plotted second)
     colvec  <- ifelse(colnames(tab) %in% paste(highlight), col.est[2], col.est[1])
+    pchvec  <- ifelse(colnames(tab) %in% paste(highlight_shape), pch.est[4], pch.est[1])
     bg.colvec  <- ifelse(colnames(tab) %in% paste(highlight), bg.est[2], bg.est[1])
     colvec2 <- ifelse(colnames(tab) %in% paste(highlight),col.est2[2], col.est2[1])
     if (horizontal)   plot(est, xlab="", ylab="", xaxt = "n", type="n", ylim=ylim, xlim=xlim)
@@ -231,17 +232,17 @@ schart <- function(data, labels=NA, highlight=NA, n=1, index.est=1, index.se=2, 
       if (horizontal) {
         if (length(ci)>1 | length(index.ci)>2) arrows(x0=xs, y0=l2, x1=xs, y1=h2, length=length, code=3, lwd=rev(lwd.est)[1], col=colvec2, angle=90)
         arrows(x0=xs, y0=l1, x1=xs, y1=h1, length=length, code=3, lwd=lwd.est[1]     , col=colvec, angle=90)
-        points(xs, est, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+        points(xs, est, pch=pchvec, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
       } else {
         if (length(ci)>1 | length(index.ci)>2) arrows(y0=xs, x0=l2, y1=xs, x1=h2, length=length, code=3, lwd=rev(lwd.est)[1], col=colvec2, angle=90)
         arrows(y0=xs, x0=l1, y1=xs, x1=h1, length=length, code=3, lwd=lwd.est[1]     , col=colvec, angle=90)
-        points(est,xs, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+        points(est,xs, pch=pchvec, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
       }
     } else {  # Just points
       if (horizontal) {
-        points(xs, est, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+        points(xs, est, pch=pchvec, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
       } else {
-        points(est,xs, pch=pch.est, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+        points(est,xs, pch=pchvec, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
       }
     }
     # Axes
