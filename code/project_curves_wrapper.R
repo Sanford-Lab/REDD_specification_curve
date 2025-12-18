@@ -151,6 +151,7 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
       # NOTE: May want to make year an input variable, or a project-specific
       # feature saved in the `projects` list with name and start year.
       result_2022 <- ates_by_year %>% filter(year == 22)
+      if (!"pval" %in% names(result_2022)) result_2022$pval <- NA
       data.frame(project_name = project[1], year = project[2],
                  ATT = result_2022$coef, lower = result_2022$lower,
                  upper = result_2022$upper, pval = result_2022$pval)
