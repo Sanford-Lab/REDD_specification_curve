@@ -198,6 +198,10 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
     curr_proj_results <- readRDS(paste0("data/results/", ate_method, "/",
                                         project[1], ".rds"))
     
+    if (!"pval" %in% names(curr_proj_results)) {
+      curr_proj_results$pval <- NA
+    }
+    
     if (show_comps & ate_method == "matching") {
       gc22 <- readRDS("data/results/gc22.rds")
       gc22$caliper <- 0.25

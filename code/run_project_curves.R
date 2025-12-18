@@ -184,5 +184,5 @@ if (run_type == "job array") {
 
 # Generate specification curves across projects.
 make_sc_curves(projects, ate_method, leftmargin = 5, show_comps = TRUE,
-               ylabel = "Cumulative Loss", show_cis = FALSE, show_pvals = TRUE)
+               ylabel = "Cumulative Loss", show_cis = TRUE, show_pvals = TRUE)
 
