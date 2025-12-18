@@ -190,27 +190,27 @@ run_sc_method <- function(projects, ate_method, p_grid, n_cores = 1,
 
 ### Make specification curves for each project.
 make_sc_curves <- function(projects, ate_method, leftmargin = 5,
-                           gc22_comp = FALSE, west23_comp = FALSE,
-                           ylabel = "", show_cis = TRUE, show_pvals = FALSE) {
+                           show_comps = FALSE, ylabel = "", show_cis = TRUE,
+                           show_pvals = FALSE) {
   
   for (project in projects) {
+    
     curr_proj_results <- readRDS(paste0("data/results/", ate_method, "/",
                                         project[1], ".rds"))
-    if (gc22_comp & ate_method == "matching") {
+    
+    if (show_comps & ate_method == "matching") {
       gc22 <- readRDS("data/results/gc22.rds")
       gc22$caliper <- 0.25
       curr_proj_results <- plyr::rbind.fill(
         curr_proj_results,
         gc22 %>% filter(project_name == project[1]))
-      highlight <- nrow(curr_proj_results)
-    } else if (west23_comp & ate_method == "synthetic_controls") {
+      comp_row <- c("GC22" = nrow(curr_proj_results))
+    } else if (show_comps & ate_method == "synthetic_controls") {
       west23 <- readRDS("data/results/west23.rds")
       curr_proj_results <- plyr::rbind.fill(
         curr_proj_results,
         west23 %>% filter(project_name == project[1]))
-      highlight <- nrow(curr_proj_results)
-    } else {
-      highlight <- NULL
+      comp_row <- c("W23" = nrow(curr_proj_results))
     }
     
     if (show_pvals) {
@@ -231,6 +231,48 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
                       leftmargin = leftmargin, highlight = highlight,
                       highlight_shape = NA,
                       ylabel = ylabel, show_cis = show_cis)
+    
+    if (show_comps) {
+      ### Set up plotting info for the comparison points
+      this <- curr_proj_results
+      this$ID <- 1:nrow(this)
+      this$comp_name <- sapply(this$ID, function(id) {
+        if (id %in% comp_row) names(comp_row)[comp_row == id] else ""})
+      this$comp <- this$comp_name != ""
+      this <- this[order(this$ATT), ]
+      
+      # Adjust alignment of label depending on sign of the effect
+      sn <- sign(this$ATT[this$comp])
+      adj <- if (sn == 1) c(0, 0.5) else c(1, 0.5)
+      
+      # Adjust position of label depending on sign of the effect and whether
+      # confidence intervals are shown.
+      ysize <- (par("usr")[4] - par("usr")[3])
+      if (show_cis) {  # Position labels around confidence intervals
+        pos <- if (sn == 1) this$upper[this$comp] else this$lower[this$comp]
+        # Handle if confidence intervals extend past y lims
+        if (pos > par("usr")[4] | pos < par("usr")[3]) {
+          pos <- if (sn == 1) par("usr")[4] else par("usr")[3]
+          adj <- if (sn == 1) c(1, 0.5) else c(0, 0.5) 
+          point_pos <- pos - sn*ysize*0.015
+          lab_pos <- pos - sn*ysize*0.025
+        } else {
+          point_pos <- pos + sn*ysize*0.015
+          lab_pos <- pos + sn*ysize*0.025
+        }
+      } else {  # Position labels around points
+        point_pos <- this$ATT[this$comp] + sn*ysize*0.015
+        lab_pos <- this$ATT[this$comp] + sn*ysize*0.025
+      }
+      
+      x_offset <- if (show_cis) 0 else 1/2
+      
+      points(x = which(this$comp) - x_offset, y = point_pos, col = "magenta3",
+             pch = 8, cex = 1)
+      text(x = which(this$comp) - x_offset, y = lab_pos,
+           labels = this$comp_name[this$comp], col = "magenta3", srt = 90,
+           adj = adj)
+    }
     dev.off()
     
     
