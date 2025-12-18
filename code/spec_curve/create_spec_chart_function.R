@@ -22,11 +22,12 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   if (show_cis) {
     ylim <- c(min(0, max(min(2*results$ATT), min(results$lower))),
               max(0, min(max(2*results$ATT), max(results$upper))))
+    cutoff <- max(abs(ylim))
+    ylim <- c(-cutoff, cutoff)
   } else {
     ylim <- c(min(0, min(results$ATT)), max(0, max(results$ATT)))
   }
-  cutoff <- max(abs(ylim))
-  ylim <- c(-cutoff, cutoff)
+  
   ylim[2] <- ylim[2] + 0.05*(ylim[2] - ylim[1])  ## Leave room for the title
   
   # Handle boolean columns

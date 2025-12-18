@@ -8,7 +8,7 @@ source("code/setup.R")  # Loads packages and grabs functions from other scripts.
 
 
 # ----- STEP 1: Set computational parameters ----------------------------------
-run_type <- "interactive"   # Set to either "interactive" or "job array"
+run_type <- "job array"   # Set to either "interactive" or "job array"
 n_cores <- 1                # Number of cores per job / on the local machine
 
 
@@ -21,44 +21,44 @@ rows_per_job <- 15
 # ----- STEP 2: Set the method and list of parameter settings -----------------
 
 ### Uncomment / adjust p_list to run for MATCHING.
-ate_method <- "matching"
-
-all_covars <- c("treecover_past", "accessibility", "accessibility_walking_only",
-                "aspect", "elevation", "slope")
-loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
-p_list <- list(method = c("nearest", "cem", "genetic"),
-               distance = c("logit", "mahalanobis", "euclidean"),
-               pop.size = c(50, 100, 500),
-               ratio = c(1, 3, 5),
-               covariates = loo_covars)
-time_vars = c("method", "pop.size")  # These variables greatly affect runtime
+# ate_method <- "matching"
+# 
+# all_covars <- c("treecover_past", "accessibility", "accessibility_walking_only",
+#                 "aspect", "elevation", "slope")
+# loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
+# p_list <- list(method = c("nearest", "cem", "genetic"),
+#                distance = c("logit", "mahalanobis", "euclidean"),
+#                pop.size = c(50, 100, 500),
+#                ratio = c(1, 3, 5),
+#                covariates = loo_covars)
+# time_vars = c("method", "pop.size")  # These variables greatly affect runtime
 
 
 ### Uncomment / adjust p_list to run for SYNTHETIC CONTROLS.
-# ate_method <- "synthetic_controls"
-# 
-# all_covars <- c("accessibility", "accessibility_walking_only", "aspect",
-#                 "elevation", "slope")
-# loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
-# p_list_g <- list(sc_method = "gsynth",
-#                  force = c("none", "unit", "time", "two-way"),
-#                  estimator = c("ife"),
-#                  r = c(1, 3, 5, "cv"))
-# p_list_m <- list(sc_method = "microsynth",
-#                  covariates = loo_covars)
-# p_list_a <- list(sc_method = "augsynth",
-#                  inf_type = c("conformal", "jackknife"),
-#                  covariates = loo_covars,
-#                  progfunc = c("None", "EN", "Ridge", "RF", "MCP", "CITS"))
-# p_list <- list("gsynth" = p_list_g, "microsynth" = p_list_m,
-#                "augsynth" = p_list_a)
-# 
-# time_vars = c("sc_method", "progfunc")  # These variables greatly affect runtime
+ate_method <- "synthetic_controls"
+
+all_covars <- c("accessibility", "accessibility_walking_only", "aspect",
+                "elevation", "slope")
+loo_covars <- lapply(1:length(all_covars), function(i) all_covars[-i])
+p_list_g <- list(sc_method = "gsynth",
+                 force = c("none", "unit", "time", "two-way"),
+                 estimator = c("ife"),
+                 r = c(1, 3, 5, "cv"))
+p_list_m <- list(sc_method = "microsynth",
+                 covariates = loo_covars)
+p_list_a <- list(sc_method = "augsynth",
+                 inf_type = c("conformal", "jackknife"),
+                 covariates = loo_covars,
+                 progfunc = c("None", "EN", "Ridge", "RF", "MCP", "CITS"))
+p_list <- list("gsynth" = p_list_g, "microsynth" = p_list_m,
+               "augsynth" = p_list_a)
+
+time_vars = c("sc_method", "progfunc")  # These variables greatly affect runtime
 
 
 
 # ----- STEP 3: Set list of projects to consider and process ------------------
-projects <- get_projects()[1]
+projects <- get_projects()
 
 
 # Process all project data sets.
@@ -184,5 +184,5 @@ if (run_type == "job array") {
 
 # Generate specification curves across projects.
 make_sc_curves(projects, ate_method, leftmargin = 5, show_comps = TRUE,
-               ylabel = "Cumulative Loss", show_cis = TRUE, show_pvals = TRUE)
+               ylabel = "Cumulative Loss", show_cis = FALSE, show_pvals = TRUE)
 
