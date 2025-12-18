@@ -240,9 +240,10 @@ schart <- function(data, labels=NA, highlight=NA, highlight_shape = NA, n=1, ind
       }
     } else {  # Just points
       if (horizontal) {
-        points(xs, est, pch=pchvec, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+        # points(xs, est, pch=pchvec, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+        barplot(est, col = colvec, border = "white", add = TRUE, xlim = xlim, space = 0)
       } else {
-        points(est,xs, pch=pchvec, lwd=lwd.symbol, col=colvec, bg=bg.colvec)
+        points(est, col = colvec, border = "white", horiz = TRUE, add = TRUE, xlim = xlim, space = 0)
       }
     }
     # Axes

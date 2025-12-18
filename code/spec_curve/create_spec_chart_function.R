@@ -19,6 +19,8 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   label_colnames <- colnames(results %>% select(-c(ATT, lower, upper, pval, year)))
   ylim <- c(min(0, max(min(2*results$ATT), min(results$lower))),
             max(0, min(max(2*results$ATT), max(results$upper))))
+  cutoff <- max(abs(ylim))
+  ylim <- c(-cutoff, cutoff)
   ylim[2] <- ylim[2] + 0.05*(ylim[2] - ylim[1])  ## Leave room for the title
   
   # Handle boolean columns
@@ -122,11 +124,11 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
          ylab=ylabel,
          leftmargin = leftmargin,
          order=spec_order,
-         col.est=c(color, "magenta3"), 
-         col.dot=c(color,"grey95","grey95","magenta3"),
-         bg.dot=c(color,"grey95","grey95","magenta3"),
+         col.est=c("gray75", color), 
+         col.dot=c("gray75","grey95","grey95", color),
+         bg.dot=c("gray75","grey95","grey95", color),
          pch.dot=c(22,22,22,22),
-         pch.est = if (show_cis) c(21,21,21,21) else c(21,21,21,20)
+         pch.est = if (show_cis) c(21,21,21,21) else c(20,20,20,20)
   )
   # print(project_name) # in format of (project_name, start_year)
   text(x=mean(1:nrow(schart_results)), y=ylim[2],

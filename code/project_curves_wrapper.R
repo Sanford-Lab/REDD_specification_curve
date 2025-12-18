@@ -214,19 +214,22 @@ make_sc_curves <- function(projects, ate_method, leftmargin = 5,
     }
     
     if (show_pvals) {
-      highlight_shape <- which(curr_proj_results$pval < 0.05)
+      highlight <- which(curr_proj_results$pval < 0.05)
+    } else {
+      highlight <- NA
     }
+    highlight_shape <- NA
     
     curr_proj_results <- curr_proj_results %>%
       filter(!is.na(ATT))
     
     # Plot and save specification curve.
     png(paste0("figs/sc/", ate_method, "/", project[1], ".png"),
-        width = 1000, height = 1000)
+        width = 1500, height = 1000)
     create_spec_chart(project_name = project[1], results = curr_proj_results,
                       spec_order = "increasing", color = "dodgerblue",
                       leftmargin = leftmargin, highlight = highlight,
-                      highlight_shape = highlight_shape,
+                      highlight_shape = NA,
                       ylabel = ylabel, show_cis = show_cis)
     dev.off()
     
