@@ -69,8 +69,8 @@ execute_method <- function(project_name, start_year, params, n_cores = 1) {
   
   # Calculate the ATE for all the years from 3 years before project start year
   # to 2022.
-  ates_by_year <- setNames(data.frame(matrix(ncol = 4, nrow = 0)), 
-                           c("year", "coef", "lower", "upper"))
+  ates_by_year <- setNames(data.frame(matrix(ncol = 5, nrow = 0)), 
+                           c("year", "coef", "lower", "upper", "pval"))
   years <- list((start_year - 3) : 22) 
   
   for (i in years[[1]]) {
@@ -86,9 +86,10 @@ execute_method <- function(project_name, start_year, params, n_cores = 1) {
     coef <- coef(ate_i)[2]
     upper <- coef(summary(ate_i))[2, 6]
     lower <- coef(summary(ate_i))[2, 5]
+    pval <- coef(summary(ate_i))[2, 4]
 
-    add <- data.frame(i, coef, lower, upper) %>%
-      setNames(c("year", "coef", "lower", "upper"))
+    add <- data.frame(i, coef, lower, upper, pval) %>%
+      setNames(c("year", "coef", "lower", "upper", "pval"))
     ates_by_year <- bind_rows(ates_by_year, add)
   }
   

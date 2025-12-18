@@ -31,6 +31,7 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
     rename(Y = outcome_var) %>%
     select(all_of(keep_vars))
   
+  
   # Convert cumulative loss from sq. meters to hectares
   if (outcome_var == "cum_loss") {
     synth_dat$Y <- synth_dat$Y / 10000
@@ -76,8 +77,9 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
       rename(se = "S.E.",
              coef = "ATT",
              lower = "CI.lower",
-             upper = "CI.upper") %>%
-      select(all_of(c("year", "coef", "lower", "upper")))
+             upper = "CI.upper",
+             pval = "p.value") %>%
+      select(all_of(c("year", "coef", "lower", "upper", "pval")))
     
     
   ### Micro synthetic controls logic 
@@ -102,12 +104,17 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
     these_results <- as.data.frame(do.call(rbind, out_microsynth$Results))
     rownames(these_results) <- NULL
     
+    ### NOTE: Confidence intervals are calculated using the linearization
+    ### method (because these are all the function returns), but p-values are
+    ### permutation-based (author recommended), so they won't necessarily align
+    ### with the confidence intervals.
     these_results <- these_results %>%
       mutate(year = start_year:22,
              coef = Trt - Con,
              lower = Linear.Lower * Con,
              upper = Linear.Upper * Con) %>%
-      select(year, coef, lower, upper)
+      rename(pval = Perm.pVal) %>%
+      select(year, coef, lower, upper, pval)
     
   ### Augmented synthetic controls logic 
   } else if (params$sc_method == "augsynth") {
@@ -124,14 +131,17 @@ execute_method <- function(project_name, start_year, params, n_cores = 1,
     sum_augsynth <- summary(out_augsynth,  # This takes a while! 
                             inf = TRUE, inf_type = params$inf_type)
     if (ncol(sum_augsynth$att) > 3) {  # CIs returned depending on progfunc
-      these_results <- sum_augsynth$att[, 1:4]
-      names(these_results) <- c("year", "coef", "lower", "upper")
+      these_results <- sum_augsynth$att[, 1:5]
+      names(these_results) <- c("year", "coef", "lower", "upper", "pval")
     } else {
       these_results <- sum_augsynth$att[, 1:3]
       names(these_results) <- c("year", "coef", "se")
-      these_results$lower <- these_results$coef - 1.96 * these_results$se
-      these_results$upper <- these_results$coef + 1.96 * these_results$se
-      these_results <- these_results[, c("year", "coef", "lower", "upper")]
+      these_results$lower <- these_results$coef - 2 * these_results$se
+      these_results$upper <- these_results$coef + 2 * these_results$se
+      these_results$pval <- 2*pnorm(-abs(these_results$coef), 0,
+                                    these_results$se)
+      these_results <- these_results[, c("year", "coef", "lower", "upper",
+                                         "pval")]
     }
       
   } else {

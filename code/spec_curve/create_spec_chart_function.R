@@ -12,12 +12,23 @@ source("code/spec_curve/schart_ortiz.R")
 
 create_spec_chart <- function(project_name, results, spec_order = "asis",
                               color = "black", leftmargin = 7,
-                              highlight = NULL, ylabel = "") {
+                              highlight = NULL, highlight_shape = NULL,
+                              ylabel = "", show_cis = show_cis) {
   
   results <- results[, names(results) != "project_name"]
-  label_colnames <- colnames(results %>% select(-c(ATT, lower, upper)))
-  ylim <- c(min(0, max(min(2*results$ATT), min(results$lower))),
-            max(0, min(max(2*results$ATT), max(results$upper))))
+  label_colnames <- colnames(results %>% select(-c(ATT, lower, upper, pval, year)))
+  
+  # Adjust y axis limits
+  if (show_cis) {
+    ylim <- c(min(0, max(min(2*results$ATT), min(results$lower))),
+              max(0, min(max(2*results$ATT), max(results$upper))))
+    cutoff <- max(abs(ylim))
+    ylim <- c(-cutoff, cutoff)
+  } else {
+    ylim <- c(min(0, min(results$ATT)), max(0, max(results$ATT)))
+  }
+  
+  ylim[2] <- ylim[2] + 0.05*(ylim[2] - ylim[1])  ## Leave room for the title
   
   # Handle boolean columns
   bool_cols <- which(sapply(1:ncol(results), function(i) class(results[1, i])) == "logical")
@@ -54,6 +65,10 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
     results$highlight <- FALSE
     results$highlight[highlight] <- TRUE
   }
+  if (!is.null(highlight_shape)) {
+    results$highlight_shape <- FALSE
+    results$highlight_shape[highlight_shape] <- TRUE
+  }
   
   results <- results %>%  # Sort labels
     arrange(across(all_of(label_colnames)))
@@ -85,11 +100,19 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   }
   
   schart_results <- these_results %>% as.data.frame() %>%
-    select(ATT, everything(), -ID, -highlight)
+    select(ATT, everything(), -ID, -highlight, -highlight_shape, -pval, -year)
   
-  index.ci <- match(c("upper","lower"), names(schart_results))
+  if (show_cis) {
+    index.ci <- match(c("upper","lower"), names(schart_results))
+  } else {
+    index.ci <- NULL
+    schart_results <- schart_results %>%
+      select(-lower, -upper)
+  }
+  
   
   highlight <- if (!is.null(highlight)) which(these_results$highlight) else NULL
+  highlight_shape <- if (!is.null(highlight_shape)) which(these_results$highlight_shape) else NULL
   
   if (ylabel != "") {
     ylabel <- paste0("ATE (", ylabel, ")")
@@ -100,20 +123,23 @@ create_spec_chart <- function(project_name, results, spec_order = "asis",
   schart(schart_results, 
          labels = labels, 
          highlight = highlight,
-         #ylim = ylim, 
+         highlight_shape = highlight_shape,
          axes = FALSE, 
          index.ci=index.ci,
+         index.se = NULL,
          ylim = ylim,
          ylab=ylabel,
          leftmargin = leftmargin,
          order=spec_order,
-         col.est=c(color,"magenta3"), 
-         col.dot=c(color,"grey95","grey95","magenta3"),
-         bg.dot=c(color,"grey95","grey95","magenta3"),
-         pch.dot=c(22,22,22,22)
+         col.est=c("gray75", color), 
+         col.dot=c("gray75","grey95","grey95", color),
+         bg.dot=c("gray75","grey95","grey95", color),
+         pch.dot=c(22,22,22,22),
+         pch.est = if (show_cis) c(21,21,21,21) else c(20,20,20,20)
   )
   # print(project_name) # in format of (project_name, start_year)
-  text(x=mean(1:nrow(schart_results)), y=max(schart_results$upper), project_name[1], col="black", font=2)
+  text(x=mean(1:nrow(schart_results)), y=ylim[2],
+       project_name[1], col="black", font=2)
   
 }
 
